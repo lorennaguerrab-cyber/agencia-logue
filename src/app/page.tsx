@@ -11,6 +11,7 @@ import { WeekView } from '@/components/dashboard/WeekView'
 import { TaskCard, NextActionCard } from '@/components/dashboard/TaskCard'
 import { ClientsWidget } from '@/components/dashboard/ClientsWidget'
 import { RotinasAncora } from '@/components/dashboard/RotinasAncora'
+import { WeekProgress } from '@/components/dashboard/WeekProgress'
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import {
@@ -96,6 +97,7 @@ export default function Dashboard() {
   const energy = ENERGY_CONFIGS[energyMode]
 
   const [dbTasks, setDbTasks] = useState<Task[]>([])
+  const [recentIdeas, setRecentIdeas] = useState<{ id: string; titulo: string }[]>([])
   const [observations, setObservations] = useState(() => {
     if (typeof window === 'undefined') return ''
     return localStorage.getItem('obs_' + new Date().toDateString()) || ''
@@ -114,6 +116,11 @@ export default function Dashboard() {
   }, [])
 
   useEffect(() => { loadTasks() }, [loadTasks])
+
+  useEffect(() => {
+    supabase.from('ideias').select('id,titulo').order('created_at', { ascending: false }).limit(3)
+      .then(({ data }) => { if (data && data.length > 0) setRecentIdeas(data) })
+  }, [])
 
   useEffect(() => {
     localStorage.setItem('obs_' + new Date().toDateString(), observations)
@@ -254,6 +261,20 @@ export default function Dashboard() {
               </CardBody>
             </Card>
 
+            {/* Sugestões por energia */}
+            <div className="rounded-[15px] border p-4 space-y-2.5" style={{ background: `color-mix(in srgb, ${energy.accent} 7%, white)`, borderColor: `color-mix(in srgb, ${energy.accent} 20%, white)` }}>
+              <div className="flex items-center gap-2">
+                <span className="text-base">{energy.emoji}</span>
+                <p className="text-[10.5px] font-bold uppercase tracking-wider" style={{ color: energy.accent }}>Para o modo {energy.label}</p>
+              </div>
+              {energy.suggestedActions.slice(0, 4).map((a) => (
+                <div key={a} className="flex items-center gap-2">
+                  <div className="w-1 h-1 rounded-full flex-shrink-0" style={{ backgroundColor: energy.accent }} />
+                  <p className="text-[12.5px] text-[var(--text-secondary)]">{a}</p>
+                </div>
+              ))}
+            </div>
+
             {/* Recent ideas */}
             <Card>
               <CardHeader>
@@ -265,7 +286,7 @@ export default function Dashboard() {
                 </div>
               </CardHeader>
               <CardBody className="pt-0 space-y-2">
-                {DEMO_IDEAS.map((idea) => (
+                {(recentIdeas.length > 0 ? recentIdeas : DEMO_IDEAS).map((idea) => (
                   <Link
                     key={idea.id}
                     href="/ideias"
@@ -280,6 +301,13 @@ export default function Dashboard() {
                 <Button variant="ghost" size="sm" className="w-full mt-1" onClick={() => setCaptureOpen(true)}>
                   <Plus size={13} /> Capturar ideia
                 </Button>
+              </CardBody>
+            </Card>
+
+            {/* Semana em números */}
+            <Card>
+              <CardBody className="pt-5">
+                <WeekProgress />
               </CardBody>
             </Card>
 
