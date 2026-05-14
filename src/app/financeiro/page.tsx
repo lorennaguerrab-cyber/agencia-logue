@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
+import { toast } from 'react-hot-toast'
 import { Card, CardBody } from '@/components/ui/Card'
 import { motion } from 'framer-motion'
 import { Plus, X, Check, TrendingUp, TrendingDown, Wallet, Target } from 'lucide-react'
@@ -167,12 +168,14 @@ export default function FinanceiroPage() {
 
   async function saveEntrada(data: Omit<EntradaRow, 'id' | 'created_at'>) {
     await supabase.from('financeiro').insert([data])
+    toast.success(data.tipo === 'receita' ? 'Receita registrada!' : 'Despesa registrada!')
     await load()
     setModalOpen(false)
   }
 
   async function deleteEntrada(id: string) {
     await supabase.from('financeiro').delete().eq('id', id)
+    toast.success('Entrada removida.')
     await load()
   }
 

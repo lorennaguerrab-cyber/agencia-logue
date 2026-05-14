@@ -7,6 +7,7 @@ import { CATEGORY_LABELS, PLATFORM_LABELS, PLATFORM_COLORS } from '@/lib/utils'
 import { Card, CardBody } from '@/components/ui/Card'
 import { motion } from 'framer-motion'
 import { Plus, Search, X, Check, Trash2, LayoutGrid, List, Calendar } from 'lucide-react'
+import { toast } from 'react-hot-toast'
 
 interface ConteudoRow {
   id: string
@@ -139,6 +140,7 @@ export default function ConteudoPage() {
 
   async function saveConteudo(data: Omit<ConteudoRow,'id'|'created_at'>) {
     await supabase.from('conteudo').insert([data])
+    toast.success('Conteúdo criado!')
     await load()
     setModalOpen(false)
   }
@@ -147,12 +149,14 @@ export default function ConteudoPage() {
     if (id.startsWith('d')) return
     await supabase.from('conteudo').update({ status }).eq('id', id)
     setItems(prev => prev.map(i => i.id === id ? { ...i, status } : i))
+    toast.success(`→ ${STATUS_CONFIG[status].label}`)
   }
 
   async function deleteItem(id: string) {
     if (id.startsWith('d')) return
     await supabase.from('conteudo').delete().eq('id', id)
     setItems(prev => prev.filter(i => i.id !== id))
+    toast.success('Conteúdo removido.')
   }
 
   const filtered = items.filter(i => !search || i.titulo.toLowerCase().includes(search.toLowerCase()))

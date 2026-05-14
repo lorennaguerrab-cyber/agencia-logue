@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
+import { toast } from 'react-hot-toast'
 import { Card, CardBody } from '@/components/ui/Card'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
@@ -329,8 +330,10 @@ export default function ClientesPage() {
   async function saveClient(data: Omit<ClientRow, 'id' | 'created_at'>) {
     if (modal.client?.id) {
       await supabase.from('clientes').update(data).eq('id', modal.client.id)
+      toast.success('Cliente atualizado!')
     } else {
       await supabase.from('clientes').insert([data])
+      toast.success('Cliente criado!')
     }
     await load()
     setModal({ open: false, client: null })
@@ -338,6 +341,7 @@ export default function ClientesPage() {
 
   async function deleteClient(id: string) {
     await supabase.from('clientes').delete().eq('id', id)
+    toast.success('Cliente removido.')
     await load()
   }
 

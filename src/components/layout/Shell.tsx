@@ -19,7 +19,8 @@ export function Shell({ children }: ShellProps) {
       <main
         className={cn(
           'flex-1 transition-all duration-300',
-          sidebarCollapsed ? 'ml-[70px]' : 'ml-[220px]'
+            'ml-0 md:ml-[220px] pt-16 md:pt-0',
+          sidebarCollapsed ? 'md:ml-[70px]' : 'md:ml-[220px]'
         )}
       >
         {children}

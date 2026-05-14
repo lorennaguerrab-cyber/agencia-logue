@@ -7,6 +7,7 @@ import { PLATFORM_LABELS } from '@/lib/utils'
 import { Card, CardBody } from '@/components/ui/Card'
 import { motion } from 'framer-motion'
 import { Plus, Search, X, Check, Trash2, MessageCircle, Clock, Pencil } from 'lucide-react'
+import { toast } from 'react-hot-toast'
 
 interface CRMRow {
   id: string
@@ -148,8 +149,10 @@ export default function CRMPage() {
   async function saveContact(data: Omit<CRMRow,'id'|'created_at'>) {
     if (modal.contact?.id && !modal.contact.id.startsWith('d')) {
       await supabase.from('crm_contatos').update(data).eq('id', modal.contact.id)
+      toast.success('Contato atualizado!')
     } else {
       await supabase.from('crm_contatos').insert([data])
+      toast.success('Contato criado!')
     }
     await load()
     setModal({ open: false, contact: null })
@@ -159,12 +162,14 @@ export default function CRMPage() {
     if (id.startsWith('d')) return
     await supabase.from('crm_contatos').update({ status }).eq('id', id)
     setContacts(prev => prev.map(c => c.id === id ? { ...c, status } : c))
+    toast.success(`→ ${STATUS_CONFIG[status].label}`)
   }
 
   async function deleteContact(id: string) {
     if (id.startsWith('d')) return
     await supabase.from('crm_contatos').delete().eq('id', id)
     setContacts(prev => prev.filter(c => c.id !== id))
+    toast.success('Contato removido.')
   }
 
   const filtered = contacts.filter(c => {

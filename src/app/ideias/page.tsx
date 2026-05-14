@@ -7,6 +7,7 @@ import { CATEGORY_LABELS, PLATFORM_LABELS, PLATFORM_COLORS } from '@/lib/utils'
 import { Card, CardBody } from '@/components/ui/Card'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Lightbulb, Plus, Search, X, Check, Trash2, FileText, Mail, Play, Sparkles } from 'lucide-react'
+import { toast } from 'react-hot-toast'
 
 interface IdeaRow {
   id: string
@@ -137,6 +138,7 @@ export default function IdeiasPage() {
 
   async function saveIdea(data: Omit<IdeaRow, 'id' | 'created_at'>) {
     await supabase.from('ideias').insert([data])
+    toast.success('Ideia salva!')
     await load()
     setModalOpen(false)
   }
@@ -145,12 +147,14 @@ export default function IdeiasPage() {
     if (id.startsWith('d')) return
     await supabase.from('ideias').update({ status }).eq('id', id)
     setIdeas(prev => prev.map(i => i.id === id ? { ...i, status } : i))
+    toast.success(`→ ${STATUS_CONFIG[status].label}`)
   }
 
   async function deleteIdea(id: string) {
     if (id.startsWith('d')) return
     await supabase.from('ideias').delete().eq('id', id)
     setIdeas(prev => prev.filter(i => i.id !== id))
+    toast.success('Ideia removida.')
   }
 
   const filtered = ideas.filter(i => {
