@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils'
 import { X, Zap, Send } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { toast } from 'react-hot-toast'
+import { supabase } from '@/lib/supabase'
 
 export function QuickCapture() {
   const { captureOpen, setCaptureOpen, addCapture, addTask, addIdea, energyMode } = useLorennStore()
@@ -58,10 +59,19 @@ export function QuickCapture() {
     }
   }
 
-  function handleSaveAll() {
+  async function handleSaveAll() {
     if (!result) return
+    // Salva no Zustand (local)
     result.tasks.forEach((t) => addTask({ id: crypto.randomUUID(), titulo: t, status: 'pendente', prioridade: 'media', energia_necessaria: [energyMode], microetapas: [], categoria: 'pessoal', recorrente: false, created_at: new Date().toISOString(), updated_at: new Date().toISOString() }))
     result.ideas.forEach((i) => addIdea({ id: crypto.randomUUID(), titulo: i, categoria: 'criatividade', plataformas: [], status: 'bruta', tags: [], conexoes: [], created_at: new Date().toISOString(), updated_at: new Date().toISOString() }))
+    // Salva no Supabase
+    if (result.tasks.length > 0) {
+      await supabase.from('tarefas').insert(result.tasks.map((t) => ({ titulo: t, status: 'pendente', prioridade: 'media', categoria: 'pessoal' })))
+    }
+    if (result.ideas.length > 0) {
+      await supabase.from('ideias').insert(result.ideas.map((i) => ({ titulo: i, status: 'bruta' })))
+    }
+    await supabase.from('capturas').insert({ texto: text, processada: true })
     toast.success(`${result.tasks.length} tarefa(s) e ${result.ideas.length} ideia(s) salvas`)
     setText(''); setResult(null); setCaptureOpen(false)
   }
