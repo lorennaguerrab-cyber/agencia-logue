@@ -8,7 +8,7 @@ import { usePathname } from 'next/navigation'
 import {
   LayoutDashboard, Zap, Archive, CheckSquare, FileText,
   BookMarked, Users, Sparkles, CalendarDays, DollarSign,
-  Flower2, Settings, ChevronLeft, ChevronRight, User,
+  Flower2, Settings, ChevronLeft, ChevronRight, User, BarChart2,
 } from 'lucide-react'
 import type { EnergyMode } from '@/lib/types'
 
@@ -23,6 +23,7 @@ const navItems = [
   { href: '/crm',          icon: Sparkles,        label: 'CRM Criativo'      },
   { href: '/calendario',   icon: CalendarDays,    label: 'Agenda'            },
   { href: '/monetizacao',  icon: DollarSign,      label: 'Monetização'      },
+  { href: '/financeiro',   icon: BarChart2,       label: 'Financeiro'        },
   { href: '/sobre',        icon: User,            label: 'Sobre'             },
   { href: '/como-por-no-ar', icon: Settings,      label: 'Como pôr no ar'   },
 ]
