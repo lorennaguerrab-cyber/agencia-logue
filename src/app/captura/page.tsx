@@ -1,27 +1,49 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useLorennStore } from '@/lib/store'
 import { ENERGY_CONFIGS } from '@/lib/energy'
+import { supabase } from '@/lib/supabase'
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
 import { timeAgo } from '@/lib/utils'
-import { Zap, Send, Plus, Archive, Mic, CheckCheck } from 'lucide-react'
+import { Zap, Send, Archive, Mic, CheckCheck } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { toast } from 'react-hot-toast'
 
+interface CapturaRecord {
+  id: string
+  texto: string
+  tipo: string
+  processada: boolean
+  created_at: string
+}
+
 export default function CapturaPage() {
-  const { captures, addCapture, addTask, addIdea, energyMode } = useLorennStore()
+  const { energyMode } = useLorennStore()
   const [text, setText] = useState('')
   const [processing, setProcessing] = useState(false)
+  const [saving, setSaving] = useState(false)
   const [result, setResult] = useState<{
     tasks: string[]
     ideas: string[]
     summary: string
     categories: string[]
   } | null>(null)
+  const [history, setHistory] = useState<CapturaRecord[]>([])
   const energy = ENERGY_CONFIGS[energyMode]
+
+  const loadHistory = useCallback(async () => {
+    const { data } = await supabase
+      .from('capturas')
+      .select('id,texto,tipo,processada,created_at')
+      .order('created_at', { ascending: false })
+      .limit(10)
+    if (data) setHistory(data)
+  }, [])
+
+  useEffect(() => { loadHistory() }, [loadHistory])
 
   async function handleProcess() {
     if (!text.trim()) return
@@ -36,17 +58,12 @@ export default function CapturaPage() {
       const data = await res.json()
       setResult(data)
 
-      addCapture({
-        id: crypto.randomUUID(),
-        conteudo_raw: text,
-        conteudo_processado: data.summary,
-        tipo: 'texto',
-        tarefas_extraidas: data.tasks || [],
-        ideias_extraidas: data.ideas || [],
-        categorias_detectadas: data.categories || [],
+      await supabase.from('capturas').insert({
+        texto: text,
+        tipo: data.tasks.length > 0 ? 'tarefa' : 'ideia',
         processada: true,
-        created_at: new Date().toISOString(),
       })
+      loadHistory()
     } catch {
       toast.error('Erro ao processar. Tente novamente.')
     } finally {
@@ -54,41 +71,42 @@ export default function CapturaPage() {
     }
   }
 
-  function handleSaveAll() {
+  async function handleSaveAll() {
     if (!result) return
+    setSaving(true)
+    try {
+      const categoria = (result.categories[0] as string) || 'pessoal'
 
-    result.tasks.forEach((taskText) => {
-      addTask({
-        id: crypto.randomUUID(),
-        titulo: taskText,
+      const taskInserts = result.tasks.map((titulo) => ({
+        titulo,
         status: 'pendente',
         prioridade: 'media',
-        energia_necessaria: [energyMode],
-        microetapas: [],
-        categoria: 'pessoal',
+        energia: [energyMode],
+        categoria,
         recorrente: false,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      })
-    })
+      }))
 
-    result.ideas.forEach((ideaText) => {
-      addIdea({
-        id: crypto.randomUUID(),
-        titulo: ideaText,
-        categoria: (result.categories[0] as any) || 'criatividade',
+      const ideaInserts = result.ideas.map((titulo) => ({
+        titulo,
+        categoria: result.categories[0] || 'criatividade',
         plataformas: [],
         status: 'bruta',
         tags: [],
-        conexoes: [],
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      })
-    })
+      }))
 
-    toast.success(`${result.tasks.length} tarefa(s) e ${result.ideas.length} ideia(s) salvas!`)
-    setText('')
-    setResult(null)
+      const ops: Promise<unknown>[] = []
+      if (taskInserts.length > 0) ops.push(supabase.from('tarefas').insert(taskInserts))
+      if (ideaInserts.length > 0) ops.push(supabase.from('ideias').insert(ideaInserts))
+      await Promise.all(ops)
+
+      toast.success(`${result.tasks.length} tarefa(s) e ${result.ideas.length} ideia(s) salvas!`)
+      setText('')
+      setResult(null)
+    } catch {
+      toast.error('Erro ao salvar. Tente novamente.')
+    } finally {
+      setSaving(false)
+    }
   }
 
   return (
@@ -108,9 +126,7 @@ export default function CapturaPage() {
 
         {/* Main capture */}
         <Card variant="elevated" className="overflow-hidden">
-          {/* Energy indicator strip */}
           <div className="h-1" style={{ backgroundColor: energy.accent }} />
-
           <CardBody className="pt-5 space-y-4">
             <div className="flex items-center gap-2 mb-1">
               <span className="text-base">{energy.emoji}</span>
@@ -168,7 +184,7 @@ export default function CapturaPage() {
                       <Zap size={16} className="text-[var(--text-accent)]" />
                       <h2 className="text-sm font-semibold text-[var(--text-primary)]">Resultado da IA</h2>
                     </div>
-                    <Button variant="primary" size="sm" onClick={handleSaveAll}>
+                    <Button variant="primary" size="sm" onClick={handleSaveAll} loading={saving}>
                       <CheckCheck size={13} />
                       Salvar tudo
                     </Button>
@@ -178,7 +194,6 @@ export default function CapturaPage() {
                   )}
                 </CardHeader>
                 <CardBody className="pt-0 grid grid-cols-2 gap-4">
-                  {/* Tasks */}
                   <div>
                     <p className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider mb-2 flex items-center gap-1">
                       <span className="text-[var(--text-accent)]">⚡</span>
@@ -198,7 +213,6 @@ export default function CapturaPage() {
                     )}
                   </div>
 
-                  {/* Ideas */}
                   <div>
                     <p className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider mb-2 flex items-center gap-1">
                       <span className="text-yellow-400">💡</span>
@@ -224,7 +238,7 @@ export default function CapturaPage() {
         </AnimatePresence>
 
         {/* History */}
-        {captures.length > 0 && (
+        {history.length > 0 && (
           <div>
             <div className="flex items-center gap-2 mb-3">
               <Archive size={14} className="text-[var(--text-muted)]" />
@@ -233,25 +247,20 @@ export default function CapturaPage() {
               </p>
             </div>
             <div className="space-y-2">
-              {captures.slice(0, 10).map((capture) => (
+              {history.map((capture) => (
                 <Card key={capture.id} hoverable>
                   <CardBody className="py-3 px-4">
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex-1 min-w-0">
                         <p className="text-sm text-[var(--text-primary)] line-clamp-2 leading-snug">
-                          {capture.conteudo_raw}
+                          {capture.texto}
                         </p>
-                        {capture.conteudo_processado && (
-                          <p className="text-xs text-[var(--text-muted)] mt-1 italic">
-                            "{capture.conteudo_processado}"
-                          </p>
-                        )}
                         <div className="flex gap-2 mt-2 flex-wrap">
-                          {capture.tarefas_extraidas.length > 0 && (
-                            <Badge variant="purple">{capture.tarefas_extraidas.length} tarefa(s)</Badge>
-                          )}
-                          {capture.ideias_extraidas.length > 0 && (
-                            <Badge variant="yellow">{capture.ideias_extraidas.length} ideia(s)</Badge>
+                          <Badge variant={capture.tipo === 'tarefa' ? 'purple' : 'yellow'}>
+                            {capture.tipo}
+                          </Badge>
+                          {capture.processada && (
+                            <Badge variant="default">processada</Badge>
                           )}
                         </div>
                       </div>

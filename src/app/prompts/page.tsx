@@ -1,16 +1,20 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Prompt, PromptCategory } from '@/lib/types'
+import { supabase } from '@/lib/supabase'
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
 import { cn } from '@/lib/utils'
-import { BookMarked, Copy, Check, Search, ChevronDown, ChevronRight, Sparkles } from 'lucide-react'
+import {
+  BookMarked, Copy, Check, Search, ChevronDown, ChevronRight,
+  Plus, Trash2, X,
+} from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { toast } from 'react-hot-toast'
 
-const PROMPTS: Prompt[] = [
+const SEED_PROMPTS: Prompt[] = [
   {
     id: 'p1',
     titulo: 'Criar post para blog',
@@ -267,7 +271,7 @@ Formato: dia a dia, hora a hora, com emoji de energia`,
   },
 ]
 
-const CATEGORY_LABELS: Record<PromptCategory, string> = {
+const CATEGORY_LABELS: Record<string, string> = {
   conteudo: 'Conteúdo',
   roteiro: 'Roteiro',
   blog: 'Blog',
@@ -287,7 +291,18 @@ const IA_COLORS: Record<string, string> = {
   perplexity: '#FBBF24',
 }
 
-function PromptCard({ prompt }: { prompt: Prompt }) {
+const BLANK_FORM = {
+  titulo: '',
+  categoria: 'conteudo' as PromptCategory,
+  descricao: '',
+  prompt_texto: '',
+  ia_recomendada: 'claude',
+  ferramenta_ideal: '',
+  checklist_raw: '',
+  etapas_raw: '',
+}
+
+function PromptCard({ prompt, onDelete }: { prompt: Prompt; onDelete?: (id: string) => void }) {
   const [expanded, setExpanded] = useState(false)
   const [copied, setCopied] = useState(false)
 
@@ -305,12 +320,12 @@ function PromptCard({ prompt }: { prompt: Prompt }) {
           <div className="flex-1">
             <div className="flex items-center gap-2 flex-wrap mb-1">
               <h3 className="text-sm font-semibold text-[var(--text-primary)]">{prompt.titulo}</h3>
-              <Badge variant="purple">{CATEGORY_LABELS[prompt.categoria]}</Badge>
+              <Badge variant="purple">{CATEGORY_LABELS[prompt.categoria] ?? prompt.categoria}</Badge>
               <span
                 className="text-[10px] px-2 py-0.5 rounded-full font-medium"
                 style={{
-                  backgroundColor: `${IA_COLORS[prompt.ia_recomendada]}22`,
-                  color: IA_COLORS[prompt.ia_recomendada],
+                  backgroundColor: `${IA_COLORS[prompt.ia_recomendada] ?? '#A78BFA'}22`,
+                  color: IA_COLORS[prompt.ia_recomendada] ?? '#A78BFA',
                 }}
               >
                 {prompt.ia_recomendada}
@@ -322,26 +337,29 @@ function PromptCard({ prompt }: { prompt: Prompt }) {
             <Button variant="ghost" size="icon" onClick={copyPrompt} title="Copiar prompt">
               {copied ? <Check size={14} className="text-green-400" /> : <Copy size={14} />}
             </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setExpanded(!expanded)}
-            >
+            {onDelete && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => onDelete(prompt.id)}
+                title="Excluir prompt"
+                className="text-[var(--text-muted)] hover:text-red-400"
+              >
+                <Trash2 size={14} />
+              </Button>
+            )}
+            <Button variant="ghost" size="icon" onClick={() => setExpanded(!expanded)}>
               {expanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
             </Button>
           </div>
         </div>
 
-        {/* Tool suggestion */}
         {prompt.ferramenta_ideal && (
-          <p className="text-[11px] text-[var(--text-muted)]">
-            🛠 {prompt.ferramenta_ideal}
-          </p>
+          <p className="text-[11px] text-[var(--text-muted)]">🛠 {prompt.ferramenta_ideal}</p>
         )}
 
-        {/* Etapas rápidas */}
         <div className="flex gap-1 flex-wrap">
-          {prompt.etapas.map((etapa, i) => (
+          {(prompt.etapas ?? []).map((etapa, i) => (
             <span
               key={etapa}
               className="text-[10px] px-2 py-0.5 rounded-full bg-[var(--bg-elevated)] text-[var(--text-muted)] border border-[var(--border)] flex items-center gap-1"
@@ -360,7 +378,6 @@ function PromptCard({ prompt }: { prompt: Prompt }) {
               className="overflow-hidden"
             >
               <div className="space-y-4 pt-2 border-t border-[var(--border)]">
-                {/* Prompt text */}
                 <div>
                   <p className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider mb-2">Prompt completo</p>
                   <div className="bg-[var(--bg-base)] rounded-xl p-4 border border-[var(--border)] relative">
@@ -376,8 +393,7 @@ function PromptCard({ prompt }: { prompt: Prompt }) {
                   </div>
                 </div>
 
-                {/* Checklist */}
-                {prompt.checklist.length > 0 && (
+                {(prompt.checklist ?? []).length > 0 && (
                   <div>
                     <p className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider mb-2">Checklist</p>
                     <ul className="space-y-1.5">
@@ -402,12 +418,68 @@ function PromptCard({ prompt }: { prompt: Prompt }) {
 export default function PromptsPage() {
   const [search, setSearch] = useState('')
   const [filterCat, setFilterCat] = useState<PromptCategory | 'todos'>('todos')
+  const [dbPrompts, setDbPrompts] = useState<Prompt[]>([])
+  const [modalOpen, setModalOpen] = useState(false)
+  const [form, setForm] = useState(BLANK_FORM)
+  const [saving, setSaving] = useState(false)
 
-  const filtered = PROMPTS.filter((p) => {
+  const loadDbPrompts = useCallback(async () => {
+    const { data } = await supabase
+      .from('prompts')
+      .select('*')
+      .eq('is_custom', true)
+      .order('created_at', { ascending: false })
+    if (data) setDbPrompts(data as Prompt[])
+  }, [])
+
+  useEffect(() => { loadDbPrompts() }, [loadDbPrompts])
+
+  const allPrompts = [...SEED_PROMPTS, ...dbPrompts]
+
+  const filtered = allPrompts.filter((p) => {
     const matchSearch = !search || p.titulo.toLowerCase().includes(search.toLowerCase()) || p.descricao.toLowerCase().includes(search.toLowerCase())
     const matchCat = filterCat === 'todos' || p.categoria === filterCat
     return matchSearch && matchCat
   })
+
+  async function handleSave() {
+    if (!form.titulo.trim() || !form.prompt_texto.trim()) {
+      toast.error('Título e prompt são obrigatórios.')
+      return
+    }
+    setSaving(true)
+    try {
+      const { error } = await supabase.from('prompts').insert({
+        titulo: form.titulo.trim(),
+        categoria: form.categoria,
+        descricao: form.descricao.trim(),
+        prompt_texto: form.prompt_texto.trim(),
+        ia_recomendada: form.ia_recomendada,
+        ferramenta_ideal: form.ferramenta_ideal.trim() || null,
+        checklist: form.checklist_raw.split('\n').map(s => s.trim()).filter(Boolean),
+        etapas: form.etapas_raw.split('\n').map(s => s.trim()).filter(Boolean),
+        referencias: [],
+        is_custom: true,
+      })
+      if (error) throw error
+      toast.success('Prompt salvo!')
+      setForm(BLANK_FORM)
+      setModalOpen(false)
+      loadDbPrompts()
+    } catch {
+      toast.error('Erro ao salvar prompt.')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  async function handleDelete(id: string) {
+    if (!confirm('Excluir este prompt?')) return
+    const { error } = await supabase.from('prompts').delete().eq('id', id)
+    if (error) { toast.error('Erro ao excluir.'); return }
+    toast.success('Prompt excluído.')
+    setDbPrompts(prev => prev.filter(p => p.id !== id))
+  }
 
   return (
     <div className="min-h-screen p-6 max-w-4xl mx-auto">
@@ -416,11 +488,16 @@ export default function PromptsPage() {
         animate={{ opacity: 1, y: 0 }}
         className="space-y-6"
       >
-        <div>
-          <h1 className="text-2xl font-semibold text-[var(--text-primary)]">Banco de Prompts</h1>
-          <p className="text-sm text-[var(--text-secondary)] mt-1">
-            Prompts prontos com IA recomendada, checklists e etapas
-          </p>
+        <div className="flex items-start justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold text-[var(--text-primary)]">Banco de Prompts</h1>
+            <p className="text-sm text-[var(--text-secondary)] mt-1">
+              Prompts prontos com IA recomendada, checklists e etapas
+            </p>
+          </div>
+          <Button variant="primary" size="sm" onClick={() => setModalOpen(true)}>
+            <Plus size={14} /> Novo prompt
+          </Button>
         </div>
 
         <div className="flex gap-3 flex-wrap">
@@ -430,12 +507,12 @@ export default function PromptsPage() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Buscar prompts..."
-              className="text-sm flex-1"
+              className="text-sm flex-1 bg-transparent outline-none text-[var(--text-primary)]"
             />
           </div>
           <select
             value={filterCat}
-            onChange={(e) => setFilterCat(e.target.value as any)}
+            onChange={(e) => setFilterCat(e.target.value as PromptCategory | 'todos')}
             className="text-sm text-[var(--text-primary)] bg-[var(--bg-elevated)] border border-[var(--border)] rounded-xl px-3 py-2"
           >
             <option value="todos">Todas categorias</option>
@@ -446,11 +523,146 @@ export default function PromptsPage() {
         </div>
 
         <div className="space-y-3">
+          {filtered.length === 0 && (
+            <p className="text-center py-10 text-sm text-[var(--text-muted)]">Nenhum prompt encontrado.</p>
+          )}
           {filtered.map((prompt) => (
-            <PromptCard key={prompt.id} prompt={prompt} />
+            <PromptCard
+              key={prompt.id}
+              prompt={prompt}
+              onDelete={prompt.id.startsWith('p') ? undefined : handleDelete}
+            />
           ))}
         </div>
       </motion.div>
+
+      {/* New prompt modal */}
+      <AnimatePresence>
+        {modalOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            style={{ background: 'rgba(43,43,43,0.5)', backdropFilter: 'blur(4px)' }}
+            onClick={(e) => { if (e.target === e.currentTarget) setModalOpen(false) }}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="bg-white rounded-[20px] border border-[var(--border)] w-full max-w-xl max-h-[90vh] overflow-y-auto"
+            >
+              <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border)]">
+                <h2 className="text-base font-semibold text-[var(--text-primary)]">Novo prompt</h2>
+                <button onClick={() => setModalOpen(false)} className="text-[var(--text-muted)] hover:text-[var(--text-primary)] p-1">
+                  <X size={18} />
+                </button>
+              </div>
+
+              <div className="p-6 space-y-4">
+                <div>
+                  <label className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">Título *</label>
+                  <input
+                    value={form.titulo}
+                    onChange={e => setForm(f => ({ ...f, titulo: e.target.value }))}
+                    placeholder="Ex: Criar caption para Instagram"
+                    className="mt-1 w-full text-sm border border-[var(--border)] rounded-xl px-3 py-2.5 bg-[var(--bg-base)] text-[var(--text-primary)] focus:outline-none focus:border-pink-300"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">Categoria</label>
+                    <select
+                      value={form.categoria}
+                      onChange={e => setForm(f => ({ ...f, categoria: e.target.value as PromptCategory }))}
+                      className="mt-1 w-full text-sm border border-[var(--border)] rounded-xl px-3 py-2.5 bg-[var(--bg-base)] text-[var(--text-primary)] focus:outline-none"
+                    >
+                      {Object.entries(CATEGORY_LABELS).map(([v, l]) => (
+                        <option key={v} value={v}>{l}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">IA recomendada</label>
+                    <select
+                      value={form.ia_recomendada}
+                      onChange={e => setForm(f => ({ ...f, ia_recomendada: e.target.value }))}
+                      className="mt-1 w-full text-sm border border-[var(--border)] rounded-xl px-3 py-2.5 bg-[var(--bg-base)] text-[var(--text-primary)] focus:outline-none"
+                    >
+                      {Object.keys(IA_COLORS).map(ia => <option key={ia} value={ia}>{ia}</option>)}
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">Descrição curta</label>
+                  <input
+                    value={form.descricao}
+                    onChange={e => setForm(f => ({ ...f, descricao: e.target.value }))}
+                    placeholder="O que esse prompt faz?"
+                    className="mt-1 w-full text-sm border border-[var(--border)] rounded-xl px-3 py-2.5 bg-[var(--bg-base)] text-[var(--text-primary)] focus:outline-none focus:border-pink-300"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">Prompt completo *</label>
+                  <textarea
+                    value={form.prompt_texto}
+                    onChange={e => setForm(f => ({ ...f, prompt_texto: e.target.value }))}
+                    placeholder="Cole aqui o prompt completo. Use [COLCHETES] para variáveis."
+                    rows={8}
+                    className="mt-1 w-full text-sm border border-[var(--border)] rounded-xl px-3 py-2.5 bg-[var(--bg-base)] text-[var(--text-primary)] focus:outline-none focus:border-pink-300 resize-none font-mono leading-relaxed"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">Ferramenta ideal</label>
+                  <input
+                    value={form.ferramenta_ideal}
+                    onChange={e => setForm(f => ({ ...f, ferramenta_ideal: e.target.value }))}
+                    placeholder="Ex: Claude + Canva"
+                    className="mt-1 w-full text-sm border border-[var(--border)] rounded-xl px-3 py-2.5 bg-[var(--bg-base)] text-[var(--text-primary)] focus:outline-none focus:border-pink-300"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">Etapas (1 por linha)</label>
+                    <textarea
+                      value={form.etapas_raw}
+                      onChange={e => setForm(f => ({ ...f, etapas_raw: e.target.value }))}
+                      placeholder={"Pesquisa\nEscrita\nRevisão"}
+                      rows={4}
+                      className="mt-1 w-full text-sm border border-[var(--border)] rounded-xl px-3 py-2.5 bg-[var(--bg-base)] text-[var(--text-primary)] focus:outline-none focus:border-pink-300 resize-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">Checklist (1 por linha)</label>
+                    <textarea
+                      value={form.checklist_raw}
+                      onChange={e => setForm(f => ({ ...f, checklist_raw: e.target.value }))}
+                      placeholder={"Definir objetivo\nEscrever com IA\nRevisar"}
+                      rows={4}
+                      className="mt-1 w-full text-sm border border-[var(--border)] rounded-xl px-3 py-2.5 bg-[var(--bg-base)] text-[var(--text-primary)] focus:outline-none focus:border-pink-300 resize-none"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex gap-3 pt-2">
+                  <Button variant="ghost" size="md" className="flex-1" onClick={() => setModalOpen(false)}>
+                    Cancelar
+                  </Button>
+                  <Button variant="primary" size="md" className="flex-1" onClick={handleSave} loading={saving}>
+                    Salvar prompt
+                  </Button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }
