@@ -8,11 +8,12 @@ import { DayFocusCard } from '@/components/dashboard/DayFocusCard'
 import { WeekView } from '@/components/dashboard/WeekView'
 import { TaskCard, NextActionCard } from '@/components/dashboard/TaskCard'
 import { ClientsWidget } from '@/components/dashboard/ClientsWidget'
+import { RotinasAncora } from '@/components/dashboard/RotinasAncora'
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import {
   Plus, Zap, Lightbulb, ArrowRight, Bell,
-  CheckSquare, Square, Sparkles, ShoppingBag, FileText,
+  Sparkles, ShoppingBag, FileText,
 } from 'lucide-react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
@@ -72,14 +73,6 @@ const DEMO_IDEAS = [
   { id: 'i3', titulo: 'Análise de marca: Por que a Duolingo domina o TikTok', created_at: new Date().toISOString() },
 ]
 
-const MORNING_ROUTINE = [
-  'Verificar Google Agenda',
-  'Definir prioridade principal do dia',
-  'Checar mensagens dos clientes',
-  'Captura mental rápida',
-  'Revisar tarefas abertas',
-]
-
 const QUICK_MONETIZATION = [
   { texto: 'Story com link de afiliado (Shopee)', tipo: 'Afiliado', cor: '#EF4444', icon: ShoppingBag },
   { texto: 'Ofereça revisão de bio por R$97 via DM', tipo: 'Consultoria', cor: '#EC4899', icon: Sparkles },
@@ -100,27 +93,14 @@ export default function Dashboard() {
   const { energyMode, tasks: storeTasks, setCaptureOpen } = useLorennStore()
   const energy = ENERGY_CONFIGS[energyMode]
 
-  const [routineChecked, setRoutineChecked] = useState<boolean[]>(() => {
-    if (typeof window === 'undefined') return MORNING_ROUTINE.map(() => false)
-    const saved = localStorage.getItem('routine_' + new Date().toDateString())
-    return saved ? JSON.parse(saved) : MORNING_ROUTINE.map(() => false)
-  })
   const [observations, setObservations] = useState(() => {
     if (typeof window === 'undefined') return ''
     return localStorage.getItem('obs_' + new Date().toDateString()) || ''
   })
 
   useEffect(() => {
-    localStorage.setItem('routine_' + new Date().toDateString(), JSON.stringify(routineChecked))
-  }, [routineChecked])
-
-  useEffect(() => {
     localStorage.setItem('obs_' + new Date().toDateString(), observations)
   }, [observations])
-
-  function toggleRoutine(i: number) {
-    setRoutineChecked((prev) => prev.map((v, idx) => idx === i ? !v : v))
-  }
 
   const allTasks = storeTasks.length > 0 ? storeTasks : DEMO_TASKS
   const visibleTasks = energy.showHeavyTasks
@@ -137,7 +117,6 @@ export default function Dashboard() {
   )
 
   const monetizationTip = getTodayMonetizationTip()
-  const routineDone = routineChecked.filter(Boolean).length
 
   const container = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.06 } } }
   const item = { hidden: { opacity: 0, y: 10 }, show: { opacity: 1, y: 0 } }
@@ -227,36 +206,10 @@ export default function Dashboard() {
           {/* Right column */}
           <motion.div variants={item} className="space-y-4">
 
-            {/* Morning routine */}
+            {/* Rotinas Âncora */}
             <Card>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <h2 className="text-sm font-semibold text-[var(--text-primary)]">Rotina da manhã</h2>
-                  <span className="text-[11px] font-medium text-pink-500">{routineDone}/{MORNING_ROUTINE.length}</span>
-                </div>
-                <div className="mt-2 h-1 bg-gray-100 rounded-full overflow-hidden">
-                  <div
-                    className="h-full rounded-full bg-pink-400 transition-all duration-500"
-                    style={{ width: `${(routineDone / MORNING_ROUTINE.length) * 100}%` }}
-                  />
-                </div>
-              </CardHeader>
-              <CardBody className="pt-0 space-y-1.5">
-                {MORNING_ROUTINE.map((item, i) => (
-                  <button
-                    key={item}
-                    onClick={() => toggleRoutine(i)}
-                    className="flex items-center gap-2.5 w-full text-left group py-0.5"
-                  >
-                    {routineChecked[i]
-                      ? <CheckSquare size={15} className="text-pink-500 flex-shrink-0" />
-                      : <Square size={15} className="text-gray-300 group-hover:text-pink-300 flex-shrink-0 transition-colors" />
-                    }
-                    <span className={`text-xs transition-colors ${routineChecked[i] ? 'text-[var(--text-muted)] line-through' : 'text-[var(--text-secondary)] group-hover:text-[var(--text-primary)]'}`}>
-                      {item}
-                    </span>
-                  </button>
-                ))}
+              <CardBody className="pt-5">
+                <RotinasAncora />
               </CardBody>
             </Card>
 
