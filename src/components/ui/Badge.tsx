@@ -8,13 +8,13 @@ interface BadgeProps {
 }
 
 const variants = {
-  default: 'bg-[var(--bg-elevated)] text-[var(--text-secondary)] border border-[var(--border)]',
-  purple: 'bg-purple-950/50 text-purple-300 border border-purple-800/30',
-  green: 'bg-emerald-950/50 text-emerald-300 border border-emerald-800/30',
-  yellow: 'bg-amber-950/50 text-amber-300 border border-amber-800/30',
-  red: 'bg-red-950/50 text-red-300 border border-red-800/30',
-  blue: 'bg-blue-950/50 text-blue-300 border border-blue-800/30',
-  pink: 'bg-pink-950/50 text-pink-300 border border-pink-800/30',
+  default: 'bg-gray-100 text-gray-600 border border-gray-200',
+  purple: 'bg-violet-50 text-violet-700 border border-violet-200',
+  green: 'bg-emerald-50 text-emerald-700 border border-emerald-200',
+  yellow: 'bg-amber-50 text-amber-700 border border-amber-200',
+  red: 'bg-red-50 text-red-600 border border-red-200',
+  blue: 'bg-blue-50 text-blue-700 border border-blue-200',
+  pink: 'bg-pink-50 text-pink-700 border border-pink-200',
 }
 
 export function Badge({ children, variant = 'default', size = 'sm', className }: BadgeProps) {

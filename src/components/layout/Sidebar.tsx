@@ -6,17 +6,8 @@ import { cn } from '@/lib/utils'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
-  LayoutDashboard,
-  Zap,
-  Lightbulb,
-  Users,
-  FileText,
-  Sparkles,
-  BookMarked,
-  ChevronLeft,
-  ChevronRight,
-  Settings,
-  Network,
+  LayoutDashboard, Zap, Lightbulb, Users, FileText,
+  Sparkles, BookMarked, ChevronLeft, ChevronRight, Network,
 } from 'lucide-react'
 
 const navItems = [
@@ -38,11 +29,11 @@ export function Sidebar() {
   return (
     <aside
       className={cn(
-        'fixed left-0 top-0 h-screen z-40 flex flex-col',
-        'transition-all duration-300 ease-in-out',
+        'fixed left-0 top-0 h-screen z-40 flex flex-col bg-white',
         'border-r border-[var(--border)]',
+        'shadow-[1px_0_0_rgba(0,0,0,0.03)]',
+        'transition-all duration-300 ease-in-out',
         sidebarCollapsed ? 'w-16' : 'w-56',
-        'bg-[var(--bg-surface)]'
       )}
     >
       {/* Logo */}
@@ -50,8 +41,8 @@ export function Sidebar() {
         'flex items-center h-16 px-4 border-b border-[var(--border)]',
         sidebarCollapsed ? 'justify-center' : 'gap-3'
       )}>
-        <div className="w-7 h-7 rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center flex-shrink-0">
-          <span className="text-white text-xs font-bold">L</span>
+        <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center flex-shrink-0 shadow-[0_2px_6px_rgba(99,102,241,0.35)]">
+          <span className="text-white text-sm font-bold">L</span>
         </div>
         {!sidebarCollapsed && (
           <div>
@@ -61,23 +52,17 @@ export function Sidebar() {
         )}
       </div>
 
-      {/* Energy mode indicator */}
-      <div className={cn(
-        'mx-3 mt-3 rounded-xl p-2.5 border',
-        'transition-all duration-400',
-        sidebarCollapsed ? 'flex justify-center' : ''
-      )}
-        style={{
-          backgroundColor: `${energy.color}66`,
-          borderColor: `${energy.accent}33`,
-        }}
+      {/* Energy indicator */}
+      <div
+        className={cn('mx-3 mt-3 rounded-xl px-3 py-2.5 border transition-all', sidebarCollapsed ? 'flex justify-center px-0' : '')}
+        style={{ backgroundColor: `${energy.accent}10`, borderColor: `${energy.accent}22` }}
       >
         {sidebarCollapsed ? (
-          <span className="text-base leading-none">{energy.emoji}</span>
+          <span className="text-lg">{energy.emoji}</span>
         ) : (
           <div>
-            <p className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider mb-1">Modo atual</p>
-            <p className="text-sm font-medium" style={{ color: energy.accent }}>
+            <p className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider mb-0.5">Modo atual</p>
+            <p className="text-sm font-semibold" style={{ color: energy.accent }}>
               {energy.emoji} {energy.label}
             </p>
           </div>
@@ -93,16 +78,16 @@ export function Sidebar() {
               key={item.href}
               href={item.href}
               className={cn(
-                'flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-all duration-150',
+                'flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-150',
                 sidebarCollapsed ? 'justify-center' : '',
                 active
-                  ? 'bg-[var(--accent-soft)] text-[var(--text-accent)] border border-[var(--border-accent)]'
-                  : 'text-[var(--text-secondary)] hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)]'
+                  ? 'bg-indigo-50 text-indigo-600 border border-indigo-100'
+                  : 'text-[var(--text-secondary)] hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)] border border-transparent'
               )}
               title={sidebarCollapsed ? item.label : undefined}
             >
               <item.icon size={17} className="flex-shrink-0" />
-              {!sidebarCollapsed && <span className="font-medium">{item.label}</span>}
+              {!sidebarCollapsed && <span>{item.label}</span>}
             </Link>
           )
         })}
@@ -111,7 +96,7 @@ export function Sidebar() {
       {/* Energy quick-switch */}
       {!sidebarCollapsed && (
         <div className="px-3 pb-3">
-          <p className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider mb-2 px-1">Trocar energia</p>
+          <p className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider mb-2 px-1 font-medium">Trocar energia</p>
           <div className="grid grid-cols-4 gap-1">
             {Object.values(ENERGY_CONFIGS).map((e) => (
               <button
@@ -119,10 +104,10 @@ export function Sidebar() {
                 onClick={() => setEnergyMode(e.id)}
                 title={e.label}
                 className={cn(
-                  'h-8 rounded-lg text-base flex items-center justify-center transition-all duration-150',
+                  'h-8 rounded-lg text-base flex items-center justify-center transition-all',
                   energyMode === e.id
-                    ? 'bg-[var(--accent-soft)] border border-[var(--border-accent)] scale-110'
-                    : 'bg-[var(--bg-elevated)] hover:bg-[var(--bg-hover)] border border-transparent'
+                    ? 'bg-indigo-50 border border-indigo-200 scale-110'
+                    : 'bg-[var(--bg-base)] hover:bg-[var(--bg-hover)] border border-transparent'
                 )}
               >
                 {e.emoji}
@@ -132,19 +117,11 @@ export function Sidebar() {
         </div>
       )}
 
-      {/* Bottom */}
-      <div className={cn(
-        'p-3 border-t border-[var(--border)] flex items-center',
-        sidebarCollapsed ? 'justify-center' : 'justify-between'
-      )}>
-        {!sidebarCollapsed && (
-          <Link href="/config" className="text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors">
-            <Settings size={15} />
-          </Link>
-        )}
+      {/* Collapse */}
+      <div className={cn('p-3 border-t border-[var(--border)] flex', sidebarCollapsed ? 'justify-center' : 'justify-end')}>
         <button
           onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-          className="text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors p-1 rounded-lg hover:bg-[var(--bg-hover)]"
+          className="text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors p-1.5 rounded-lg hover:bg-[var(--bg-hover)]"
         >
           {sidebarCollapsed ? <ChevronRight size={15} /> : <ChevronLeft size={15} />}
         </button>

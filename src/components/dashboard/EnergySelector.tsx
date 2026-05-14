@@ -12,7 +12,7 @@ export function EnergySelector() {
 
   return (
     <div className="space-y-3">
-      <p className="text-xs text-[var(--text-muted)] uppercase tracking-wider">Como você está agora?</p>
+      <p className="text-[11px] text-[var(--text-muted)] uppercase tracking-wider font-medium">Como você está agora?</p>
       <div className="grid grid-cols-4 gap-2 sm:grid-cols-7">
         {Object.values(ENERGY_CONFIGS).map((e) => {
           const active = energyMode === e.id
@@ -20,32 +20,29 @@ export function EnergySelector() {
             <motion.button
               key={e.id}
               onClick={() => setEnergyMode(e.id as EnergyMode)}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
               className={cn(
                 'flex flex-col items-center gap-1.5 p-2.5 rounded-xl border transition-all duration-200 cursor-pointer',
                 active
-                  ? 'border-[var(--border-accent)] shadow-lg'
-                  : 'border-[var(--border)] hover:border-[var(--border-accent)]/50 bg-[var(--bg-elevated)]'
+                  ? 'shadow-[0_2px_8px_rgba(99,102,241,0.15)]'
+                  : 'border-[var(--border)] bg-white hover:bg-[var(--bg-hover)] hover:border-indigo-200'
               )}
               style={active ? {
-                backgroundColor: `${e.color}99`,
-                boxShadow: `0 0 20px ${e.accent}20`,
+                backgroundColor: `${e.accent}10`,
+                borderColor: `${e.accent}28`,
               } : {}}
               title={e.description}
             >
               <span className="text-xl leading-none">{e.emoji}</span>
               <span
-                className="text-[10px] font-medium leading-tight text-center"
+                className="text-[10px] font-semibold leading-tight text-center"
                 style={{ color: active ? e.accent : 'var(--text-muted)' }}
               >
                 {e.label}
               </span>
               {active && (
-                <div
-                  className="w-1 h-1 rounded-full pulse-dot"
-                  style={{ backgroundColor: e.accent }}
-                />
+                <div className="w-1 h-1 rounded-full pulse-dot" style={{ backgroundColor: e.accent }} />
               )}
             </motion.button>
           )
@@ -54,7 +51,7 @@ export function EnergySelector() {
       {current && (
         <motion.p
           key={current.id}
-          initial={{ opacity: 0, y: 4 }}
+          initial={{ opacity: 0, y: 3 }}
           animate={{ opacity: 1, y: 0 }}
           className="text-sm text-[var(--text-secondary)]"
         >

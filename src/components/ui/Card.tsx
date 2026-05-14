@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils'
 import { HTMLAttributes } from 'react'
 
 interface CardProps extends HTMLAttributes<HTMLDivElement> {
-  variant?: 'default' | 'elevated' | 'glass' | 'accent'
+  variant?: 'default' | 'elevated' | 'flat' | 'accent'
   hoverable?: boolean
 }
 
@@ -12,14 +12,14 @@ export function Card({ className, variant = 'default', hoverable, children, ...p
   return (
     <div
       className={cn(
-        'rounded-2xl',
+        'rounded-2xl border',
         {
-          'bg-[var(--bg-surface)] border border-[var(--border)]': variant === 'default',
-          'bg-[var(--bg-elevated)] border border-[var(--border)]': variant === 'elevated',
-          'glass': variant === 'glass',
-          'bg-[var(--accent-soft)] border border-[var(--border-accent)]': variant === 'accent',
+          'bg-white border-[var(--border)] shadow-[0_1px_3px_rgba(0,0,0,0.07),0_1px_2px_rgba(0,0,0,0.04)]': variant === 'default',
+          'bg-[var(--bg-elevated)] border-[var(--border)] shadow-[0_4px_8px_rgba(0,0,0,0.06)]': variant === 'elevated',
+          'bg-[var(--bg-base)] border-transparent shadow-none': variant === 'flat',
+          'bg-indigo-50 border-indigo-100': variant === 'accent',
         },
-        hoverable && 'transition-all duration-200 cursor-pointer hover:border-[var(--border-accent)] hover:bg-[var(--bg-hover)] hover:-translate-y-0.5',
+        hoverable && 'transition-all duration-200 cursor-pointer hover:shadow-[0_4px_12px_rgba(0,0,0,0.09)] hover:-translate-y-0.5 hover:border-indigo-200',
         className
       )}
       {...props}
@@ -31,7 +31,7 @@ export function Card({ className, variant = 'default', hoverable, children, ...p
 
 export function CardHeader({ className, children, ...props }: HTMLAttributes<HTMLDivElement>) {
   return (
-    <div className={cn('p-5 pb-3', className)} {...props}>
+    <div className={cn('px-5 pt-5 pb-3', className)} {...props}>
       {children}
     </div>
   )

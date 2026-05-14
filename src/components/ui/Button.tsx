@@ -16,18 +16,18 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         disabled={disabled || loading}
         className={cn(
-          'inline-flex items-center justify-center gap-2 font-medium rounded-xl transition-all duration-200 cursor-pointer select-none',
+          'inline-flex items-center justify-center gap-2 font-medium rounded-xl transition-all duration-150 cursor-pointer select-none',
           'disabled:opacity-40 disabled:cursor-not-allowed',
           {
-            'bg-[#7C3AED] hover:bg-[#6D28D9] text-white shadow-lg shadow-purple-900/20':
+            'bg-[#6366F1] hover:bg-[#4F46E5] active:bg-[#4338CA] text-white shadow-[0_1px_3px_rgba(99,102,241,0.3)]':
               variant === 'primary',
-            'bg-[var(--bg-elevated)] hover:bg-[var(--bg-hover)] text-[var(--text-primary)] border border-[var(--border)]':
+            'bg-white hover:bg-[var(--bg-hover)] text-[var(--text-primary)] border border-[var(--border)] shadow-[var(--shadow-xs)]':
               variant === 'secondary',
             'hover:bg-[var(--bg-hover)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]':
               variant === 'ghost',
-            'bg-red-950/50 hover:bg-red-900/60 text-red-400 border border-red-900/30':
+            'bg-red-50 hover:bg-red-100 text-red-600 border border-red-200':
               variant === 'danger',
-            'glass text-[var(--text-primary)] hover:border-[var(--border-accent)]':
+            'bg-white/90 backdrop-blur text-[var(--text-primary)] border border-[var(--border)] hover:bg-white':
               variant === 'glass',
           },
           {
