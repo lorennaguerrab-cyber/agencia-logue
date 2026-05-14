@@ -1,5 +1,19 @@
 @import "tailwindcss";
 
+/* Sobrescreve a escala pink do Tailwind com as cores Papel da Lola */
+@theme {
+  --color-pink-50:  #FFE3EE;
+  --color-pink-100: #FFC7DD;
+  --color-pink-200: #FFB3CE;
+  --color-pink-300: #FF9BBF;
+  --color-pink-400: #FF8BB6;
+  --color-pink-500: #FF78B0;
+  --color-pink-600: #E8538D;
+  --color-pink-700: #C44878;
+  --color-pink-800: #A03060;
+  --color-pink-900: #7A1F47;
+}
+
 :root {
   /* ── Papel da Lola — paleta oficial ── */
   --pink:        #FF78B0;
@@ -85,7 +99,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .gradient-text {
-  background: linear-gradient(135deg, #EC4899 0%, #A78BFA 100%);
+  background: linear-gradient(135deg, #FF78B0 0%, #E8538D 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
