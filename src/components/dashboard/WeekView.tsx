@@ -3,7 +3,7 @@
 import { cn } from '@/lib/utils'
 
 const WEEK_STRUCTURE = [
-  { day: 'Seg', focus: 'Burocracia + Blog', color: '#6366F1' },
+  { day: 'Seg', focus: 'Burocracia + Blog', color: '#EC4899' },
   { day: 'Ter', focus: 'Clientes', color: '#3B82F6' },
   { day: 'Qua', focus: 'Conteúdo', color: '#8B5CF6' },
   { day: 'Qui', focus: 'Newsletter', color: '#10B981' },
@@ -28,7 +28,7 @@ export function WeekView() {
               className={cn(
                 'rounded-xl p-2 border transition-all text-center',
                 isToday
-                  ? 'border-indigo-200 bg-indigo-50 shadow-[0_2px_8px_rgba(99,102,241,0.1)]'
+                  ? 'border-pink-200 bg-pink-50 shadow-[0_2px_8px_rgba(236,72,153,0.1)]'
                   : 'border-[var(--border)] bg-white'
               )}
             >

@@ -72,10 +72,10 @@ export function QuickCapture() {
         onClick={() => setCaptureOpen(true)}
         className={cn(
           'fixed bottom-6 right-6 z-50 w-14 h-14 rounded-2xl',
-          'bg-gradient-to-br from-indigo-500 to-violet-500',
-          'shadow-[0_4px_16px_rgba(99,102,241,0.4)]',
+          'bg-gradient-to-br from-pink-500 to-violet-500',
+          'shadow-[0_4px_16px_rgba(236,72,153,0.4)]',
           'flex items-center justify-center text-white',
-          'transition-all duration-200 hover:scale-105 hover:shadow-[0_6px_20px_rgba(99,102,241,0.5)] active:scale-95',
+          'transition-all duration-200 hover:scale-105 hover:shadow-[0_6px_20px_rgba(236,72,153,0.5)] active:scale-95',
           captureOpen && 'opacity-0 pointer-events-none'
         )}
         title="Captura Rápida (⌘K)"
@@ -102,7 +102,7 @@ export function QuickCapture() {
               <div className="bg-white rounded-2xl border border-[var(--border)] overflow-hidden shadow-[0_20px_40px_rgba(0,0,0,0.12)]">
                 <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--border)]">
                   <div className="flex items-center gap-2">
-                    <Zap size={16} className="text-indigo-500" />
+                    <Zap size={16} className="text-pink-500" />
                     <span className="text-sm font-semibold text-[var(--text-primary)]">Captura Mental</span>
                     <span className="text-[10px] text-[var(--text-muted)] bg-gray-100 px-2 py-0.5 rounded-full">⌘K</span>
                   </div>
@@ -125,9 +125,9 @@ export function QuickCapture() {
                 {result && (
                   <div className="px-4 pb-4 space-y-3">
                     {result.tasks.length > 0 && (
-                      <div className="bg-indigo-50 rounded-xl p-3 border border-indigo-100">
-                        <p className="text-[10px] text-indigo-500 uppercase tracking-wider mb-2 font-semibold">⚡ {result.tasks.length} tarefa(s)</p>
-                        <ul className="space-y-1">{result.tasks.map((t, i) => <li key={i} className="text-sm text-[var(--text-primary)] flex gap-2"><span className="text-indigo-400">→</span>{t}</li>)}</ul>
+                      <div className="bg-pink-50 rounded-xl p-3 border border-pink-100">
+                        <p className="text-[10px] text-pink-500 uppercase tracking-wider mb-2 font-semibold">⚡ {result.tasks.length} tarefa(s)</p>
+                        <ul className="space-y-1">{result.tasks.map((t, i) => <li key={i} className="text-sm text-[var(--text-primary)] flex gap-2"><span className="text-pink-400">→</span>{t}</li>)}</ul>
                       </div>
                     )}
                     {result.ideas.length > 0 && (

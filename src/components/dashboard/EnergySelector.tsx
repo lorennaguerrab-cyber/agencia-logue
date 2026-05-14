@@ -25,8 +25,8 @@ export function EnergySelector() {
               className={cn(
                 'flex flex-col items-center gap-1.5 p-2.5 rounded-xl border transition-all duration-200 cursor-pointer',
                 active
-                  ? 'shadow-[0_2px_8px_rgba(99,102,241,0.15)]'
-                  : 'border-[var(--border)] bg-white hover:bg-[var(--bg-hover)] hover:border-indigo-200'
+                  ? 'shadow-[0_2px_8px_rgba(236,72,153,0.15)]'
+                  : 'border-[var(--border)] bg-white hover:bg-[var(--bg-hover)] hover:border-pink-200'
               )}
               style={active ? {
                 backgroundColor: `${e.accent}10`,

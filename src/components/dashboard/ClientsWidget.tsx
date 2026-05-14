@@ -15,7 +15,7 @@ export function ClientsWidget() {
     <div className="space-y-2.5">
       <div className="flex items-center justify-between">
         <p className="text-[11px] text-[var(--text-muted)] uppercase tracking-wider font-medium">Clientes ativos</p>
-        <Link href="/clientes" className="text-[10px] text-indigo-500 hover:text-indigo-700 flex items-center gap-1 font-semibold">
+        <Link href="/clientes" className="text-[10px] text-pink-500 hover:text-pink-700 flex items-center gap-1 font-semibold">
           Ver todos <ArrowRight size={10} />
         </Link>
       </div>
@@ -24,7 +24,7 @@ export function ClientsWidget() {
           <Link
             key={client.id}
             href="/clientes"
-            className="flex items-center gap-3 p-2.5 rounded-xl bg-white border border-[var(--border)] hover:border-indigo-200 hover:bg-indigo-50/40 transition-all shadow-[0_1px_2px_rgba(0,0,0,0.04)]"
+            className="flex items-center gap-3 p-2.5 rounded-xl bg-white border border-[var(--border)] hover:border-pink-200 hover:bg-pink-50/40 transition-all shadow-[0_1px_2px_rgba(0,0,0,0.04)]"
           >
             <div
               className="w-8 h-8 rounded-lg flex-shrink-0 flex items-center justify-center text-xs font-bold"
@@ -48,7 +48,7 @@ export function ClientsWidget() {
               </div>
             </div>
             {client.tarefas_pendentes > 0 && (
-              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-indigo-50 text-indigo-600 border border-indigo-100">
+              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-pink-50 text-pink-600 border border-pink-100">
                 {client.tarefas_pendentes}
               </span>
             )}

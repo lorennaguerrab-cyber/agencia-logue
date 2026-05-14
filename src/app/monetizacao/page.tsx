@@ -15,18 +15,18 @@ const DAILY_IDEAS = [
   { tipo: 'Conteúdo pago', plataforma: 'Hotmart', ideia: 'Mini e-book "Como montar seu primeiro calendário de conteúdo" — R$19,90. Divulgue no Stories por 24h.', cor: '#8B5CF6', icon: FileText },
   { tipo: 'UGC', plataforma: 'Marcas locais', ideia: 'Entre em contato com uma marca local de Itabira para propor um pacote UGC de 4 vídeos. Apresente seu portfólio.', cor: '#10B981', icon: Video },
   { tipo: 'Newsletter', plataforma: 'Substack', ideia: 'Envie uma edição extra da newsletter com assunto quente da semana. Chame para assinar o plano pago.', cor: '#FF6719', icon: Mail },
-  { tipo: 'Consultoria', plataforma: 'DM/WhatsApp', ideia: 'Ofereça uma sessão de 30min de "revisão de bio e feed" por R$97 via DM. Limite de 3 vagas hoje.', cor: '#6366F1', icon: TrendingUp },
+  { tipo: 'Consultoria', plataforma: 'DM/WhatsApp', ideia: 'Ofereça uma sessão de 30min de "revisão de bio e feed" por R$97 via DM. Limite de 3 vagas hoje.', cor: '#EC4899', icon: TrendingUp },
   { tipo: 'Afiliado', plataforma: 'Shopee', ideia: 'Review de eletrônico útil para criadores (ring light, microfone, suporte de celular). Story ou Reels com link.', cor: '#EF4444', icon: ShoppingBag },
   { tipo: 'Afiliado', plataforma: 'Shopee', ideia: 'Post de "achados de make" com produtos de beleza que você usa. "Uso há X meses — link para comprar."', cor: '#EC4899', icon: ShoppingBag },
   { tipo: 'Afiliado', plataforma: 'Shopee', ideia: 'Story de "roupinha favorita do mês" com link de afiliado para a peça ou look similar.', cor: '#EC4899', icon: ShoppingBag },
   { tipo: 'Afiliado', plataforma: 'Shopee', ideia: 'Sapato ou tênis que está usando muito — story casual "esse tênis tá aparecendo demais aqui em casa, link na bio."', cor: '#F97316', icon: ShoppingBag },
-  { tipo: 'Conteúdo pago', plataforma: 'Instagram Close Friends', ideia: 'Crie um grupo de Close Friends para conteúdo exclusivo por R$29,90/mês. Anuncie hoje nas Stories.', cor: '#6366F1', icon: TrendingUp },
+  { tipo: 'Conteúdo pago', plataforma: 'Instagram Close Friends', ideia: 'Crie um grupo de Close Friends para conteúdo exclusivo por R$29,90/mês. Anuncie hoje nas Stories.', cor: '#EC4899', icon: TrendingUp },
   { tipo: 'Agência', plataforma: 'Prospecção', ideia: 'Envie mensagem para 3 empresas locais com uma análise gratuita do Instagram delas. Feche reunião de diagnóstico.', cor: '#3B82F6', icon: TrendingUp },
   { tipo: 'Afiliado', plataforma: 'Amazon', ideia: 'Recomende livro de maternidade ou desenvolvimento pessoal para o público do Papel da Lola.', cor: '#F97316', icon: ShoppingBag },
 ]
 
 const MONETIZATION_OVERVIEW = [
-  { label: 'Agência Logue', meta: 'R$ 6.000/mês', cor: '#6366F1' },
+  { label: 'Agência Logue', meta: 'R$ 6.000/mês', cor: '#EC4899' },
   { label: 'UGC Creator', meta: 'R$ 2.000/mês', cor: '#8B5CF6' },
   { label: 'Afiliados', meta: 'R$ 500/mês', cor: '#EF4444' },
   { label: 'Produtos digitais', meta: 'R$ 1.000/mês', cor: '#10B981' },
@@ -116,7 +116,7 @@ export default function MonetizacaoPage() {
           ))}
           <div className="pt-2 border-t border-[var(--border)] flex items-center justify-between">
             <span className="text-sm font-semibold text-[var(--text-primary)]">Total meta</span>
-            <span className="text-sm font-bold text-indigo-600">R$ 10.000/mês</span>
+            <span className="text-sm font-bold text-pink-600">R$ 10.000/mês</span>
           </div>
         </CardBody>
       </Card>

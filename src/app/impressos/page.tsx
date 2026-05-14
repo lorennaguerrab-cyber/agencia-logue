@@ -20,7 +20,7 @@ const TEMPLATES: Template[] = [
     id: 'rotina-semanal',
     titulo: 'Rotina Semanal',
     descricao: 'Planejamento da semana com blocos de foco',
-    cor: '#6366F1',
+    cor: '#EC4899',
     perguntas: [
       { id: 'semana', label: 'Qual semana? (ex: 19 a 25 de maio)', tipo: 'text' },
       { id: 'intencao', label: 'Qual a intenção principal da semana?', tipo: 'text' },
@@ -462,7 +462,7 @@ export default function ImpressosPage() {
                         onChange={(e) => setRespostas((prev) => ({ ...prev, [p.id]: e.target.value }))}
                         placeholder="Digite aqui..."
                         rows={3}
-                        className="w-full text-sm text-[var(--text-primary)] bg-[var(--bg-base)] border border-[var(--border)] rounded-xl px-3 py-2.5 focus:outline-none focus:border-indigo-300 focus:ring-2 focus:ring-indigo-100 resize-none transition-all"
+                        className="w-full text-sm text-[var(--text-primary)] bg-[var(--bg-base)] border border-[var(--border)] rounded-xl px-3 py-2.5 focus:outline-none focus:border-pink-300 focus:ring-2 focus:ring-pink-100 resize-none transition-all"
                       />
                     ) : (
                       <input
@@ -470,7 +470,7 @@ export default function ImpressosPage() {
                         value={respostas[p.id] || ''}
                         onChange={(e) => setRespostas((prev) => ({ ...prev, [p.id]: e.target.value }))}
                         placeholder="Digite aqui..."
-                        className="w-full text-sm text-[var(--text-primary)] bg-[var(--bg-base)] border border-[var(--border)] rounded-xl px-3 py-2.5 focus:outline-none focus:border-indigo-300 focus:ring-2 focus:ring-indigo-100 transition-all"
+                        className="w-full text-sm text-[var(--text-primary)] bg-[var(--bg-base)] border border-[var(--border)] rounded-xl px-3 py-2.5 focus:outline-none focus:border-pink-300 focus:ring-2 focus:ring-pink-100 transition-all"
                       />
                     )}
                   </div>

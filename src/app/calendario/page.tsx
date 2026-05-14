@@ -54,7 +54,7 @@ export default function CalendarioPage() {
           href="https://calendar.google.com"
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-1.5 text-xs text-indigo-600 hover:text-indigo-800 font-medium border border-indigo-200 bg-indigo-50 px-3 py-1.5 rounded-lg transition-colors"
+          className="flex items-center gap-1.5 text-xs text-pink-600 hover:text-indigo-800 font-medium border border-pink-200 bg-pink-50 px-3 py-1.5 rounded-lg transition-colors"
         >
           <ExternalLink size={12} />
           Abrir Google Agenda
@@ -87,7 +87,7 @@ export default function CalendarioPage() {
                 className={`aspect-square flex items-center justify-center rounded-xl text-sm transition-all ${
                   day === null ? '' :
                   isCurrentMonth && day === today
-                    ? 'bg-indigo-500 text-white font-bold shadow-[0_2px_8px_rgba(99,102,241,0.3)]'
+                    ? 'bg-pink-500 text-white font-bold shadow-[0_2px_8px_rgba(236,72,153,0.3)]'
                     : 'hover:bg-[var(--bg-hover)] text-[var(--text-secondary)] cursor-pointer'
                 }`}
               >
@@ -123,11 +123,11 @@ export default function CalendarioPage() {
       </Card>
 
       {/* Nota integração */}
-      <div className="bg-indigo-50 border border-indigo-100 rounded-xl p-4 flex gap-3">
-        <CalendarDays size={16} className="text-indigo-500 flex-shrink-0 mt-0.5" />
+      <div className="bg-pink-50 border border-pink-100 rounded-xl p-4 flex gap-3">
+        <CalendarDays size={16} className="text-pink-500 flex-shrink-0 mt-0.5" />
         <div>
-          <p className="text-sm font-semibold text-indigo-700">Integração com Google Agenda</p>
-          <p className="text-xs text-indigo-600 mt-1 leading-relaxed">
+          <p className="text-sm font-semibold text-pink-700">Integração com Google Agenda</p>
+          <p className="text-xs text-pink-600 mt-1 leading-relaxed">
             Para ver seus eventos do Google Agenda aqui, será necessário conectar sua conta Google. Clique em "Abrir Google Agenda" acima para gerenciar seus compromissos diretamente lá por enquanto.
           </p>
         </div>

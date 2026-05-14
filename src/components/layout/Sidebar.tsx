@@ -6,24 +6,28 @@ import { cn } from '@/lib/utils'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
-  LayoutDashboard, Zap, Lightbulb, Users, FileText,
-  Sparkles, BookMarked, ChevronLeft, ChevronRight,
-  User, DollarSign, CalendarDays, Printer,
+  LayoutDashboard, Zap, Archive, CheckSquare, FileText,
+  BookMarked, Users, Sparkles, CalendarDays, DollarSign,
+  Flower2, Settings, ChevronLeft, ChevronRight, User,
 } from 'lucide-react'
+import type { EnergyMode } from '@/lib/types'
 
 const navItems = [
-  { href: '/', icon: LayoutDashboard, label: 'Dashboard' },
-  { href: '/captura', icon: Zap, label: 'Captura Mental' },
-  { href: '/ideias', icon: Lightbulb, label: 'Banco de Ideias' },
-  { href: '/conteudo', icon: FileText, label: 'Conteúdo' },
-  { href: '/clientes', icon: Users, label: 'Clientes' },
-  { href: '/calendario', icon: CalendarDays, label: 'Calendário' },
-  { href: '/monetizacao', icon: DollarSign, label: 'Monetização' },
-  { href: '/impressos', icon: Printer, label: 'Impressos' },
-  { href: '/prompts', icon: BookMarked, label: 'Prompts' },
-  { href: '/crm', icon: Sparkles, label: 'CRM Criativo' },
-  { href: '/sobre', icon: User, label: 'Sobre' },
+  { href: '/',             icon: LayoutDashboard, label: 'Dashboard'         },
+  { href: '/captura',      icon: Zap,             label: 'Baú de Ideias'     },
+  { href: '/ideias',       icon: Archive,         label: 'Acervo de Conteúdo'},
+  { href: '/tarefas',      icon: CheckSquare,     label: 'Tarefas'           },
+  { href: '/conteudo',     icon: FileText,        label: 'Conteúdo'          },
+  { href: '/prompts',      icon: BookMarked,      label: 'Prompts'           },
+  { href: '/clientes',     icon: Users,           label: 'Clientes'          },
+  { href: '/crm',          icon: Sparkles,        label: 'CRM Criativo'      },
+  { href: '/calendario',   icon: CalendarDays,    label: 'Agenda'            },
+  { href: '/monetizacao',  icon: DollarSign,      label: 'Monetização'      },
+  { href: '/sobre',        icon: User,            label: 'Sobre'             },
+  { href: '/como-por-no-ar', icon: Settings,      label: 'Como pôr no ar'   },
 ]
+
+const ENERGY_ORDER: EnergyMode[] = ['cansada', 'criativa', 'operacional', 'foco', 'social', 'maternidade', 'gravacao']
 
 export function Sidebar() {
   const { sidebarCollapsed, setSidebarCollapsed, energyMode, setEnergyMode } = useLorennStore()
@@ -35,39 +39,40 @@ export function Sidebar() {
       className={cn(
         'fixed left-0 top-0 h-screen z-40 flex flex-col bg-white',
         'border-r border-[var(--border)]',
-        'shadow-[1px_0_0_rgba(0,0,0,0.03)]',
         'transition-all duration-300 ease-in-out',
-        sidebarCollapsed ? 'w-16' : 'w-56',
+        sidebarCollapsed ? 'w-[70px]' : 'w-[220px]',
       )}
     >
-      {/* Logo */}
+      {/* Brand */}
       <div className={cn(
-        'flex items-center h-16 px-4 border-b border-[var(--border)]',
-        sidebarCollapsed ? 'justify-center' : 'gap-3'
+        'flex items-center h-[68px] px-5 border-b border-[var(--border)]',
+        sidebarCollapsed ? 'justify-center px-0' : 'gap-3'
       )}>
-        <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center flex-shrink-0 shadow-[0_2px_6px_rgba(99,102,241,0.35)]">
-          <span className="text-white text-sm font-bold">L</span>
+        <div
+          className="w-[42px] h-[42px] rounded-[15px] flex items-center justify-center flex-shrink-0"
+          style={{ background: 'var(--pink)' }}
+        >
+          <span className="text-white text-lg font-bold" style={{ fontFamily: 'var(--font-syne)' }}>L</span>
         </div>
         {!sidebarCollapsed && (
           <div>
-            <p className="text-[var(--text-primary)] font-semibold text-sm leading-tight">Lorenna OS</p>
-            <p className="text-[var(--text-muted)] text-[10px]">Agência Logue</p>
-            <p className="text-[var(--text-muted)] text-[10px]">@lorennagn</p>
+            <p className="font-bold text-[17px] leading-tight text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-syne)', letterSpacing: '-0.02em' }}>Lorenna OS</p>
+            <p className="text-[11px] text-[var(--text-muted)] mt-0.5">Agência Logue · Papel da Lola</p>
           </div>
         )}
       </div>
 
-      {/* Energy indicator */}
+      {/* Energy chip */}
       <div
-        className={cn('mx-3 mt-3 rounded-xl px-3 py-2.5 border transition-all', sidebarCollapsed ? 'flex justify-center px-0' : '')}
-        style={{ backgroundColor: `${energy.accent}10`, borderColor: `${energy.accent}22` }}
+        className={cn('mx-3 mt-3 rounded-[15px] px-3 py-2.5 border transition-all', sidebarCollapsed ? 'flex justify-center px-0' : '')}
+        style={{ backgroundColor: `${energy.accent}12`, borderColor: `${energy.accent}30` }}
       >
         {sidebarCollapsed ? (
-          <span className="text-lg">{energy.emoji}</span>
+          <span className="text-xl">{energy.emoji}</span>
         ) : (
           <div>
-            <p className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider mb-0.5">Modo atual</p>
-            <p className="text-sm font-semibold" style={{ color: energy.accent }}>
+            <p className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider font-medium mb-0.5">Modo atual</p>
+            <p className="text-sm font-semibold" style={{ color: energy.accent, fontFamily: 'var(--font-syne)' }}>
               {energy.emoji} {energy.label}
             </p>
           </div>
@@ -83,26 +88,58 @@ export function Sidebar() {
               key={item.href}
               href={item.href}
               className={cn(
-                'flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-150',
+                'flex items-center gap-3 rounded-[15px] px-3 py-[11px] text-[13.5px] font-medium transition-all duration-150',
                 sidebarCollapsed ? 'justify-center' : '',
                 active
-                  ? 'bg-indigo-50 text-indigo-600 border border-indigo-100'
-                  : 'text-[var(--text-secondary)] hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)] border border-transparent'
+                  ? 'border border-transparent'
+                  : 'text-[var(--text-secondary)] hover:bg-[var(--offwhite)] hover:text-[var(--text-primary)] border border-transparent'
               )}
+              style={active ? {
+                background: 'var(--pink-tint)',
+                color: 'var(--pink-deep)',
+              } : undefined}
               title={sidebarCollapsed ? item.label : undefined}
             >
-              <item.icon size={17} className="flex-shrink-0" />
+              <item.icon size={17} className="flex-shrink-0" style={active ? { color: 'var(--pink-deep)' } : { color: 'var(--gray)' }} />
               {!sidebarCollapsed && <span>{item.label}</span>}
             </Link>
           )
         })}
       </nav>
 
-      {/* Collapse */}
+      {/* Energy quick-switch */}
+      {!sidebarCollapsed && (
+        <div className="px-4 pb-3">
+          <p className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider font-medium mb-2">Trocar energia</p>
+          <div className="grid grid-cols-4 gap-1">
+            {ENERGY_ORDER.map((id) => {
+              const e = ENERGY_CONFIGS[id]
+              return (
+                <button
+                  key={id}
+                  onClick={() => setEnergyMode(id)}
+                  title={e.label}
+                  className={cn(
+                    'h-9 rounded-[12px] text-base border transition-all',
+                    energyMode === id
+                      ? 'border-[var(--pink-soft)]'
+                      : 'bg-[var(--offwhite)] border-transparent hover:bg-[var(--gray-light)]'
+                  )}
+                  style={energyMode === id ? { background: 'var(--pink-tint)', borderColor: 'var(--pink-soft)' } : undefined}
+                >
+                  {e.emoji}
+                </button>
+              )
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Collapse toggle */}
       <div className={cn('p-3 border-t border-[var(--border)] flex', sidebarCollapsed ? 'justify-center' : 'justify-end')}>
         <button
           onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-          className="text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors p-1.5 rounded-lg hover:bg-[var(--bg-hover)]"
+          className="text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors p-1.5 rounded-[10px] hover:bg-[var(--offwhite)]"
         >
           {sidebarCollapsed ? <ChevronRight size={15} /> : <ChevronLeft size={15} />}
         </button>

@@ -1,34 +1,52 @@
 @import "tailwindcss";
 
 :root {
-  --bg-base: #F4F5F9;
-  --bg-surface: #FFFFFF;
-  --bg-elevated: #FAFBFF;
-  --bg-hover: #EEF0F8;
+  /* ── Papel da Lola — paleta oficial ── */
+  --pink:        #FF78B0;
+  --pink-soft:   #FFC7DD;
+  --pink-tint:   #FFE3EE;
+  --pink-deep:   #E8538D;
 
-  --accent: #6366F1;
-  --accent-muted: #818CF8;
-  --accent-glow: rgba(99, 102, 241, 0.12);
-  --accent-soft: rgba(99, 102, 241, 0.07);
+  --ink:         #2B2B2B;
+  --ink-soft:    #4A4A4A;
+  --gray:        #908F8E;
+  --gray-light:  #EAEAEA;
+  --offwhite:    #F7F3F0;
+  --offwhite-2:  #FFFCFA;
+  --beige:       #FFF9E9;
 
-  --text-primary: #111827;
-  --text-secondary: #4B5563;
-  --text-muted: #9CA3AF;
-  --text-accent: #6366F1;
+  /* System aliases */
+  --bg-base:        #F7F3F0;
+  --bg-surface:     #FFFFFF;
+  --bg-elevated:    #FFFCFA;
+  --bg-hover:       #EAEAEA;
+  --bg-inset:       #F7F3F0;
 
-  --border: rgba(0, 0, 0, 0.07);
-  --border-subtle: rgba(0, 0, 0, 0.04);
-  --border-accent: rgba(99, 102, 241, 0.2);
+  --accent:         #FF78B0;
+  --accent-muted:   #FFC7DD;
+  --accent-glow:    rgba(255, 120, 176, 0.12);
+  --accent-soft:    rgba(255, 120, 176, 0.07);
 
-  --shadow-xs: 0 1px 2px rgba(0,0,0,0.04);
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.04);
-  --shadow-md: 0 4px 8px rgba(0,0,0,0.06), 0 2px 4px rgba(0,0,0,0.03);
-  --shadow-lg: 0 10px 24px rgba(0,0,0,0.08), 0 4px 8px rgba(0,0,0,0.04);
+  --text-primary:   #2B2B2B;
+  --text-secondary: #4A4A4A;
+  --text-muted:     #908F8E;
+  --text-accent:    #E8538D;
 
-  --success: #10B981;
-  --warning: #F59E0B;
-  --danger: #EF4444;
-  --info: #3B82F6;
+  --border:         #EAEAEA;
+  --border-subtle:  rgba(0, 0, 0, 0.04);
+  --border-accent:  #FF78B0;
+  --border-soft:    #FFC7DD;
+
+  /* No shadows (Papel da Lola rule) */
+  --shadow-xs: none;
+  --shadow-sm: none;
+  --shadow-md: none;
+  --shadow-lg: none;
+
+  --success: #7FB68C;
+  --warning: #E89B4C;
+  --danger:  #C44878;
+  --info:    #A89AC9;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -67,7 +85,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .gradient-text {
-  background: linear-gradient(135deg, #6366F1 0%, #A78BFA 100%);
+  background: linear-gradient(135deg, #EC4899 0%, #A78BFA 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

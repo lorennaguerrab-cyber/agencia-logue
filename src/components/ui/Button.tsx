@@ -19,7 +19,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           'inline-flex items-center justify-center gap-2 font-medium rounded-xl transition-all duration-150 cursor-pointer select-none',
           'disabled:opacity-40 disabled:cursor-not-allowed',
           {
-            'bg-[#6366F1] hover:bg-[#4F46E5] active:bg-[#4338CA] text-white shadow-[0_1px_3px_rgba(99,102,241,0.3)]':
+            'bg-[#EC4899] hover:bg-[#DB2777] active:bg-[#BE185D] text-white shadow-[0_1px_3px_rgba(236,72,153,0.3)]':
               variant === 'primary',
             'bg-white hover:bg-[var(--bg-hover)] text-[var(--text-primary)] border border-[var(--border)] shadow-[var(--shadow-xs)]':
               variant === 'secondary',

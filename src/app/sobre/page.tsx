@@ -6,7 +6,7 @@ import { ExternalLink, Play, Globe } from 'lucide-react'
 const SOCIAL_LINKS = [
   { label: 'LinkedIn', href: 'https://www.linkedin.com/in/lorennaguerra/', icon: Globe, color: '#0A66C2' },
   { label: 'YouTube @lorennaguerra', href: 'https://www.youtube.com/@lorennaguerra', icon: Play, color: '#FF0000' },
-  { label: 'Papel da Lola (site)', href: 'https://www.papeldalola.com', icon: Globe, color: '#6366F1' },
+  { label: 'Papel da Lola (site)', href: 'https://www.papeldalola.com', icon: Globe, color: '#EC4899' },
   { label: '@lorennagn', href: 'https://www.instagram.com/lorennagn/', icon: Globe, color: '#E1306C' },
   { label: '@papeldalola', href: 'https://www.instagram.com/papeldalola/', icon: Globe, color: '#E1306C' },
   { label: '@agencialogue', href: 'https://www.instagram.com/agencialogue/', icon: Globe, color: '#E1306C' },
@@ -16,7 +16,7 @@ const SOCIAL_LINKS = [
 ]
 
 const MONETIZATION_FORMS = [
-  { titulo: 'Agência Logue', desc: 'Gestão de redes sociais para empresas. Clientes ativos: Academia Itabira Fit, Espaço Criar, Óptica Igor Giordano, Jornal Cidades Minerais.', color: '#6366F1' },
+  { titulo: 'Agência Logue', desc: 'Gestão de redes sociais para empresas. Clientes ativos: Academia Itabira Fit, Espaço Criar, Óptica Igor Giordano, Jornal Cidades Minerais.', color: '#EC4899' },
   { titulo: 'UGC Creator', desc: 'Criação de conteúdo para marcas sem aparecer como rosto oficial. Produto gerado, pago por entrega.', color: '#8B5CF6' },
   { titulo: 'Papel da Lola (Blog)', desc: 'Blog sobre branding, maternidade e IA. Monetização via afiliados, patrocínios e produtos digitais.', color: '#EC4899' },
   { titulo: 'Newsletter', desc: 'Lista própria no Substack. Potencial de patrocínio e venda de produtos.', color: '#F59E0B' },
@@ -66,7 +66,7 @@ export default function SobrePage() {
       <Card>
         <CardHeader>
           <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-indigo-400" />
+            <div className="w-2 h-2 rounded-full bg-pink-400" />
             <h2 className="text-base font-semibold text-[var(--text-primary)]">Agência Logue</h2>
           </div>
           <p className="text-xs text-[var(--text-muted)] mt-0.5">@agencialogue</p>

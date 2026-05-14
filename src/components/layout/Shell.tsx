@@ -19,7 +19,7 @@ export function Shell({ children }: ShellProps) {
       <main
         className={cn(
           'flex-1 transition-all duration-300',
-          sidebarCollapsed ? 'ml-16' : 'ml-56'
+          sidebarCollapsed ? 'ml-[70px]' : 'ml-[220px]'
         )}
       >
         {children}

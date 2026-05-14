@@ -82,7 +82,7 @@ const MORNING_ROUTINE = [
 
 const QUICK_MONETIZATION = [
   { texto: 'Story com link de afiliado (Shopee)', tipo: 'Afiliado', cor: '#EF4444', icon: ShoppingBag },
-  { texto: 'Ofereça revisão de bio por R$97 via DM', tipo: 'Consultoria', cor: '#6366F1', icon: Sparkles },
+  { texto: 'Ofereça revisão de bio por R$97 via DM', tipo: 'Consultoria', cor: '#EC4899', icon: Sparkles },
   { texto: 'Compartilhe link da newsletter no Stories', tipo: 'Newsletter', cor: '#FF6719', icon: FileText },
   { texto: 'Prospecte 1 empresa local para a agência', tipo: 'Agência', cor: '#10B981', icon: Zap },
 ]
@@ -218,7 +218,7 @@ export default function Dashboard() {
                   onChange={(e) => setObservations(e.target.value)}
                   placeholder="Como foi o dia? O que te ocupou a mente? O que funcionou ou não funcionou?"
                   rows={4}
-                  className="w-full text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] bg-[var(--bg-base)] border border-[var(--border)] rounded-xl px-3 py-2.5 resize-none leading-relaxed focus:outline-none focus:border-indigo-300 focus:ring-2 focus:ring-indigo-100 transition-all"
+                  className="w-full text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] bg-[var(--bg-base)] border border-[var(--border)] rounded-xl px-3 py-2.5 resize-none leading-relaxed focus:outline-none focus:border-pink-300 focus:ring-2 focus:ring-pink-100 transition-all"
                 />
               </CardBody>
             </Card>
@@ -232,11 +232,11 @@ export default function Dashboard() {
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <h2 className="text-sm font-semibold text-[var(--text-primary)]">Rotina da manhã</h2>
-                  <span className="text-[11px] font-medium text-indigo-500">{routineDone}/{MORNING_ROUTINE.length}</span>
+                  <span className="text-[11px] font-medium text-pink-500">{routineDone}/{MORNING_ROUTINE.length}</span>
                 </div>
                 <div className="mt-2 h-1 bg-gray-100 rounded-full overflow-hidden">
                   <div
-                    className="h-full rounded-full bg-indigo-400 transition-all duration-500"
+                    className="h-full rounded-full bg-pink-400 transition-all duration-500"
                     style={{ width: `${(routineDone / MORNING_ROUTINE.length) * 100}%` }}
                   />
                 </div>
@@ -249,8 +249,8 @@ export default function Dashboard() {
                     className="flex items-center gap-2.5 w-full text-left group py-0.5"
                   >
                     {routineChecked[i]
-                      ? <CheckSquare size={15} className="text-indigo-500 flex-shrink-0" />
-                      : <Square size={15} className="text-gray-300 group-hover:text-indigo-300 flex-shrink-0 transition-colors" />
+                      ? <CheckSquare size={15} className="text-pink-500 flex-shrink-0" />
+                      : <Square size={15} className="text-gray-300 group-hover:text-pink-300 flex-shrink-0 transition-colors" />
                     }
                     <span className={`text-xs transition-colors ${routineChecked[i] ? 'text-[var(--text-muted)] line-through' : 'text-[var(--text-secondary)] group-hover:text-[var(--text-primary)]'}`}>
                       {item}

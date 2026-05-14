@@ -10,7 +10,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 const PRIORITY_CONFIG = {
   urgente: { text: '#DC2626', bg: '#FEF2F2', border: '#FECACA', label: 'Urgente' },
   alta: { text: '#D97706', bg: '#FFFBEB', border: '#FDE68A', label: 'Alta' },
-  media: { text: '#6366F1', bg: '#EEF2FF', border: '#C7D2FE', label: 'Média' },
+  media: { text: '#EC4899', bg: '#EEF2FF', border: '#C7D2FE', label: 'Média' },
   baixa: { text: '#059669', bg: '#ECFDF5', border: '#A7F3D0', label: 'Baixa' },
 }
 
@@ -51,7 +51,7 @@ export function TaskCard({ task, showMicrosteps = false }: TaskCardProps) {
             onClick={completeTask}
             className={cn(
               'flex-shrink-0 w-5 h-5 rounded-lg border-2 flex items-center justify-center mt-0.5 transition-all',
-              done ? 'bg-indigo-500 border-indigo-500' : 'border-gray-300 hover:border-indigo-400'
+              done ? 'bg-pink-500 border-pink-500' : 'border-gray-300 hover:border-pink-400'
             )}
           >
             {done && <Check size={11} className="text-white" />}
@@ -75,7 +75,7 @@ export function TaskCard({ task, showMicrosteps = false }: TaskCardProps) {
                 <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
                   <div
                     className="h-full rounded-full transition-all duration-500"
-                    style={{ width: `${progress}%`, backgroundColor: progress === 100 ? '#10B981' : '#6366F1' }}
+                    style={{ width: `${progress}%`, backgroundColor: progress === 100 ? '#10B981' : '#EC4899' }}
                   />
                 </div>
                 <span className="text-[10px] text-[var(--text-muted)] font-medium">{completedSteps}/{totalSteps}</span>
@@ -112,7 +112,7 @@ export function TaskCard({ task, showMicrosteps = false }: TaskCardProps) {
                 >
                   <div className={cn(
                     'flex-shrink-0 w-4 h-4 rounded border flex items-center justify-center mt-0.5 transition-all',
-                    step.concluida ? 'bg-emerald-500 border-emerald-500' : 'border-gray-300 group-hover:border-indigo-400'
+                    step.concluida ? 'bg-emerald-500 border-emerald-500' : 'border-gray-300 group-hover:border-pink-400'
                   )}>
                     {step.concluida && <Check size={9} className="text-white" />}
                   </div>
@@ -137,10 +137,10 @@ export function NextActionCard({ task }: { task: Task }) {
   if (!nextStep && task.microetapas.length > 0) return null
 
   return (
-    <div className="rounded-xl p-4 border border-indigo-100 bg-indigo-50 shadow-[0_1px_3px_rgba(99,102,241,0.08)]">
+    <div className="rounded-xl p-4 border border-pink-100 bg-pink-50 shadow-[0_1px_3px_rgba(236,72,153,0.08)]">
       <div className="flex items-center gap-2 mb-2">
-        <Zap size={14} className="text-indigo-500" />
-        <p className="text-xs font-bold text-indigo-600 uppercase tracking-wider">Próxima ação</p>
+        <Zap size={14} className="text-pink-500" />
+        <p className="text-xs font-bold text-pink-600 uppercase tracking-wider">Próxima ação</p>
       </div>
       <p className="text-sm font-semibold text-[var(--text-primary)] mb-1">{task.titulo}</p>
       {nextStep && <p className="text-xs text-[var(--text-secondary)]">→ {nextStep.descricao}</p>}

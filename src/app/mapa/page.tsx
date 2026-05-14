@@ -24,14 +24,14 @@ const INITIAL_NODES: Node[] = [
     position: { x: 400, y: 300 },
     type: 'default',
     style: {
-      background: 'linear-gradient(135deg, #6366F1, #A78BFA)',
+      background: 'linear-gradient(135deg, #EC4899, #A78BFA)',
       color: '#fff',
       border: 'none',
       borderRadius: 16,
       padding: '12px 20px',
       fontWeight: 700,
       fontSize: 14,
-      boxShadow: '0 4px 20px rgba(99,102,241,0.35)',
+      boxShadow: '0 4px 20px rgba(236,72,153,0.35)',
       minWidth: 140,
       textAlign: 'center',
     },
@@ -44,8 +44,8 @@ const INITIAL_NODES: Node[] = [
     position: { x: 150, y: 150 },
     style: {
       background: '#EEF2FF',
-      color: '#4F46E5',
-      border: '1px solid rgba(99,102,241,0.25)',
+      color: '#DB2777',
+      border: '1px solid rgba(236,72,153,0.25)',
       borderRadius: 12,
       padding: '8px 16px',
       fontSize: 12,
@@ -56,7 +56,7 @@ const INITIAL_NODES: Node[] = [
     id: 'blog',
     data: { label: '📝 Papel da Lola' },
     position: { x: 50, y: 80 },
-    style: { background: '#FFFFFF', color: '#6366F1', border: '1px solid rgba(99,102,241,0.15)', borderRadius: 10, padding: '6px 12px', fontSize: 11, boxShadow: '0 1px 3px rgba(0,0,0,0.06)' },
+    style: { background: '#FFFFFF', color: '#EC4899', border: '1px solid rgba(236,72,153,0.15)', borderRadius: 10, padding: '6px 12px', fontSize: 11, boxShadow: '0 1px 3px rgba(0,0,0,0.06)' },
   },
   {
     id: 'instagram',
@@ -160,7 +160,7 @@ const INITIAL_NODES: Node[] = [
     id: 'agencia',
     data: { label: '🚀 Agência Logue' },
     position: { x: 150, y: 450 },
-    style: { background: '#EEF2FF', color: '#4F46E5', border: '1px solid rgba(99,102,241,0.25)', borderRadius: 12, padding: '8px 16px', fontSize: 12, fontWeight: 600 },
+    style: { background: '#EEF2FF', color: '#DB2777', border: '1px solid rgba(236,72,153,0.25)', borderRadius: 12, padding: '8px 16px', fontSize: 12, fontWeight: 600 },
   },
 ]
 
@@ -170,10 +170,10 @@ const INITIAL_EDGES: Edge[] = [
   { id: 'e2', source: 'lorenna', target: 'conteudo', style: { stroke: '#10B981', strokeWidth: 2 }, markerEnd: { type: MarkerType.ArrowClosed, color: '#10B981' } },
   { id: 'e3', source: 'lorenna', target: 'clientes', style: { stroke: '#F59E0B', strokeWidth: 2 }, markerEnd: { type: MarkerType.ArrowClosed, color: '#F59E0B' } },
   { id: 'e4', source: 'lorenna', target: 'temas', style: { stroke: '#F59E0B', strokeWidth: 1.5 }, animated: true },
-  { id: 'e5', source: 'lorenna', target: 'agencia', style: { stroke: '#6366F1', strokeWidth: 1.5 } },
+  { id: 'e5', source: 'lorenna', target: 'agencia', style: { stroke: '#EC4899', strokeWidth: 1.5 } },
 
   // Marca → canais
-  { id: 'e6', source: 'marca', target: 'blog', style: { stroke: '#6366F1', strokeWidth: 1 } },
+  { id: 'e6', source: 'marca', target: 'blog', style: { stroke: '#EC4899', strokeWidth: 1 } },
   { id: 'e7', source: 'marca', target: 'instagram', style: { stroke: '#EC4899', strokeWidth: 1 } },
   { id: 'e8', source: 'marca', target: 'youtube', style: { stroke: '#EF4444', strokeWidth: 1 } },
 
@@ -195,7 +195,7 @@ const INITIAL_EDGES: Edge[] = [
 
   // Interconexões
   { id: 'e19', source: 'branding', target: 'conteudo', style: { stroke: '#8B5CF6', strokeWidth: 1, opacity: 0.4 }, animated: true },
-  { id: 'e20', source: 'agencia', target: 'clientes', style: { stroke: '#6366F1', strokeWidth: 1, opacity: 0.5 } },
+  { id: 'e20', source: 'agencia', target: 'clientes', style: { stroke: '#EC4899', strokeWidth: 1, opacity: 0.5 } },
 ]
 
 export default function MapaPage() {
@@ -250,7 +250,7 @@ export default function MapaPage() {
             }}
             nodeColor={(node) => {
               const style = node.style as Record<string, string>
-              return style?.color || '#6366F1'
+              return style?.color || '#EC4899'
             }}
           />
         </ReactFlow>

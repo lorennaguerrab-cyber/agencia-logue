@@ -58,7 +58,7 @@ export function DayFocusCard() {
                 onChange={(e) => setDraft(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && save()}
                 placeholder="Qual é o foco de hoje?"
-                className="flex-1 text-base font-semibold text-[var(--text-primary)] bg-white border border-indigo-200 rounded-xl px-3 py-2 shadow-[0_0_0_3px_rgba(99,102,241,0.08)] focus:outline-none"
+                className="flex-1 text-base font-semibold text-[var(--text-primary)] bg-white border border-pink-200 rounded-xl px-3 py-2 shadow-[0_0_0_3px_rgba(236,72,153,0.08)] focus:outline-none"
               />
               <button
                 onClick={save}
