@@ -1,101 +1,72 @@
 'use client'
 
-import { useState } from 'react'
 import { useLorennStore } from '@/lib/store'
 import { ENERGY_CONFIGS } from '@/lib/energy'
-import { getGreeting, formatDateFull } from '@/lib/utils'
-import { Pencil, Check } from 'lucide-react'
-import { motion } from 'framer-motion'
 
 export function DayFocusCard() {
-  const { dayFocus, setDayFocus, energyMode } = useLorennStore()
-  const [editing, setEditing] = useState(false)
-  const [draft, setDraft] = useState(dayFocus)
-  const energy = ENERGY_CONFIGS[energyMode]
-  const today = formatDateFull(new Date())
+  const { energyMode } = useLorennStore()
+  const e = ENERGY_CONFIGS[energyMode]
 
-  function save() {
-    setDayFocus(draft)
-    setEditing(false)
-  }
+  const now = new Date()
+  const weekday = now.toLocaleDateString('pt-BR', { weekday: 'long' })
+  const day = now.getDate()
+  const month = now.toLocaleDateString('pt-BR', { month: 'long' })
+  const h = now.getHours()
+  const greet = h < 12 ? 'Bom dia' : h < 18 ? 'Boa tarde' : 'Boa noite'
 
   return (
     <div
-      className="rounded-2xl p-6 border relative overflow-hidden bg-white"
-      style={{
-        borderColor: `${energy.accent}20`,
-        background: `linear-gradient(135deg, ${energy.accent}08 0%, #FFFFFF 55%)`,
-        boxShadow: '0 1px 3px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.04)',
-      }}
+      className="rounded-[15px] border relative overflow-hidden"
+      style={{ background: 'var(--pink-tint)', borderColor: 'var(--pink-soft)' }}
     >
-      <div
-        className="absolute -top-10 -right-10 w-40 h-40 rounded-full blur-3xl pointer-events-none opacity-[0.07]"
-        style={{ backgroundColor: energy.accent }}
-      />
+      {/* Flor decorativa */}
+      <svg width="160" height="160" viewBox="0 0 180 180" style={{ position: 'absolute', right: -16, top: -24, opacity: 0.25, pointerEvents: 'none' }}>
+        <g stroke="var(--pink)" strokeWidth="1.3" fill="none" strokeLinecap="round">
+          <path d="M90 30c-10 12-10 26 0 38s10 24 0 36"/>
+          <path d="M60 60c12 10 26 10 38 0s24-10 36 0"/>
+          <ellipse cx="90" cy="70" rx="12" ry="22" transform="rotate(0 90 70)"/>
+          <ellipse cx="90" cy="70" rx="12" ry="22" transform="rotate(60 90 70)"/>
+          <ellipse cx="90" cy="70" rx="12" ry="22" transform="rotate(120 90 70)"/>
+          <circle cx="90" cy="70" r="5" fill="var(--pink)" stroke="none"/>
+        </g>
+      </svg>
 
-      <div className="relative">
-        <div className="flex items-center justify-between mb-1">
-          <p className="text-xs text-[var(--text-muted)] uppercase tracking-wider font-medium">{today}</p>
-          <span
-            className="text-[11px] px-2.5 py-1 rounded-full font-semibold border"
-            style={{ backgroundColor: `${energy.accent}10`, borderColor: `${energy.accent}20`, color: energy.accent }}
-          >
-            {energy.emoji} {energy.label}
-          </span>
-        </div>
+      <div className="relative p-7">
+        {/* Eyebrow */}
+        <p className="text-[10.5px] font-medium uppercase tracking-[0.12em] text-[var(--text-muted)] mb-2">
+          {weekday.charAt(0).toUpperCase() + weekday.slice(1)} · {day} de {month}
+        </p>
 
-        <h1 className="text-2xl font-semibold text-[var(--text-primary)] mt-2">
-          {getGreeting()}, Lorenna
+        {/* Título */}
+        <h1
+          className="text-[30px] font-semibold leading-[1.05] text-[var(--text-primary)] mb-2"
+          style={{ fontFamily: 'var(--font-syne)', letterSpacing: '-0.03em' }}
+        >
+          {greet}, Lorenna.
         </h1>
 
-        <div className="mt-5">
-          <p className="text-[11px] text-[var(--text-muted)] uppercase tracking-wider font-medium mb-2">Foco do dia</p>
-          {editing ? (
-            <div className="flex items-center gap-2">
-              <input
-                autoFocus
-                value={draft}
-                onChange={(e) => setDraft(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && save()}
-                placeholder="Qual é o foco de hoje?"
-                className="flex-1 text-base font-semibold text-[var(--text-primary)] bg-white border border-pink-200 rounded-xl px-3 py-2 shadow-[0_0_0_3px_rgba(236,72,153,0.08)] focus:outline-none"
-              />
-              <button
-                onClick={save}
-                className="w-9 h-9 rounded-xl flex items-center justify-center transition-colors"
-                style={{ backgroundColor: `${energy.accent}12`, color: energy.accent }}
-              >
-                <Check size={16} />
-              </button>
-            </div>
-          ) : (
-            <button
-              onClick={() => { setEditing(true); setDraft(dayFocus) }}
-              className="group flex items-center gap-2 text-left"
-            >
-              {dayFocus ? (
-                <p className="text-xl font-semibold text-[var(--text-primary)]">{dayFocus}</p>
-              ) : (
-                <p className="text-base text-[var(--text-muted)] italic">Clique para definir seu foco...</p>
-              )}
-              <Pencil size={13} className="text-[var(--text-muted)] opacity-0 group-hover:opacity-60 transition-opacity flex-shrink-0" />
-            </button>
-          )}
-        </div>
+        {/* Subtítulo */}
+        <p className="text-[14.5px] text-[var(--text-secondary)] mb-6" style={{ maxWidth: 480 }}>
+          Hoje sua energia está{' '}
+          <strong style={{ color: e.accent, fontWeight: 600 }}>{e.label.toLowerCase()}</strong>
+          {' '}— {e.description.toLowerCase()}
+        </p>
 
-        <div className="mt-4 flex flex-wrap gap-2">
-          {energy.suggestedActions.slice(0, 3).map((action) => (
-            <span
-              key={action}
-              className="text-xs px-2.5 py-1 rounded-lg border font-medium"
-              style={{
-                backgroundColor: `${energy.accent}08`,
-                borderColor: `${energy.accent}18`,
-                color: energy.accent,
-              }}
+        {/* Pills */}
+        <div className="flex flex-wrap gap-3">
+          {[
+            { icon: e.emoji, text: e.label },
+            { icon: '🌸', text: '3 prioridades pra hoje' },
+            { icon: '📅', text: '2 lembretes fixos' },
+          ].map((p) => (
+            <div
+              key={p.text}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border bg-white text-xs font-medium text-[var(--text-secondary)]"
+              style={{ borderColor: 'var(--gray-light)' }}
             >
-              {action}
-            </span>
+              <span className="text-sm">{p.icon}</span>
+              {p.text}
+            </div>
           ))}
         </div>
       </div>
