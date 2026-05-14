@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { useLorennStore } from '@/lib/store'
 import { ENERGY_CONFIGS } from '@/lib/energy'
 import { EnergySelector } from '@/components/dashboard/EnergySelector'
@@ -9,7 +10,10 @@ import { TaskCard, NextActionCard } from '@/components/dashboard/TaskCard'
 import { ClientsWidget } from '@/components/dashboard/ClientsWidget'
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
-import { Plus, Zap, Lightbulb, ArrowRight, Bell } from 'lucide-react'
+import {
+  Plus, Zap, Lightbulb, ArrowRight, Bell,
+  CheckSquare, Square, Sparkles, ShoppingBag, FileText,
+} from 'lucide-react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 
@@ -32,7 +36,7 @@ const DEMO_TASKS = [
   },
   {
     id: '2',
-    titulo: 'Entregar posts semana Pratique Academia',
+    titulo: 'Entregar posts semana Academia Itabira Fit',
     status: 'em_progresso' as const,
     prioridade: 'urgente' as const,
     energia_necessaria: ['operacional' as const],
@@ -63,19 +67,60 @@ const DEMO_TASKS = [
 ]
 
 const DEMO_IDEAS = [
-  { id: 'i1', titulo: '"Domingo é o único dia em que tenho 47 ideias criativas e zero energia pra executar"', categoria: 'bastidores', created_at: new Date().toISOString() },
-  { id: 'i2', titulo: 'Série: Mulheres que viraram marca — episódio 1', categoria: 'mulheres_incriveis', created_at: new Date().toISOString() },
-  { id: 'i3', titulo: 'Análise de marca: Por que a Duolingo domina o TikTok', categoria: 'analise_marcas', created_at: new Date().toISOString() },
+  { id: 'i1', titulo: '"Domingo é o único dia em que tenho 47 ideias e zero energia pra executar"', created_at: new Date().toISOString() },
+  { id: 'i2', titulo: 'Série: Mulheres que viraram marca — episódio 1', created_at: new Date().toISOString() },
+  { id: 'i3', titulo: 'Análise de marca: Por que a Duolingo domina o TikTok', created_at: new Date().toISOString() },
 ]
 
+const MORNING_ROUTINE = [
+  'Verificar Google Agenda',
+  'Definir prioridade principal do dia',
+  'Checar mensagens dos clientes',
+  'Captura mental rápida',
+  'Revisar tarefas abertas',
+]
+
+const QUICK_MONETIZATION = [
+  { texto: 'Story com link de afiliado (Shopee)', tipo: 'Afiliado', cor: '#EF4444', icon: ShoppingBag },
+  { texto: 'Ofereça revisão de bio por R$97 via DM', tipo: 'Consultoria', cor: '#6366F1', icon: Sparkles },
+  { texto: 'Compartilhe link da newsletter no Stories', tipo: 'Newsletter', cor: '#FF6719', icon: FileText },
+  { texto: 'Prospecte 1 empresa local para a agência', tipo: 'Agência', cor: '#10B981', icon: Zap },
+]
+
+function getTodayMonetizationTip() {
+  return QUICK_MONETIZATION[new Date().getDate() % QUICK_MONETIZATION.length]
+}
+
 const RECURRENCES = [
-  { texto: '📚 Tarefas escolares do Davi', hora: 'Antes das 10h30', cor: '#F9A8D4' },
-  { texto: '⚽ Futebol', hora: 'Qua e Sex às 8h20', cor: '#6EE7B7' },
+  { texto: 'Tarefas escolares — Mateus e Murilo', hora: 'Antes das 10h30', cor: '#F9A8D4' },
+  { texto: 'Futebol — Mateus e Murilo', hora: 'Qua e Sex às 8h20', cor: '#6EE7B7' },
 ]
 
 export default function Dashboard() {
   const { energyMode, tasks: storeTasks, setCaptureOpen } = useLorennStore()
   const energy = ENERGY_CONFIGS[energyMode]
+
+  const [routineChecked, setRoutineChecked] = useState<boolean[]>(() => {
+    if (typeof window === 'undefined') return MORNING_ROUTINE.map(() => false)
+    const saved = localStorage.getItem('routine_' + new Date().toDateString())
+    return saved ? JSON.parse(saved) : MORNING_ROUTINE.map(() => false)
+  })
+  const [observations, setObservations] = useState(() => {
+    if (typeof window === 'undefined') return ''
+    return localStorage.getItem('obs_' + new Date().toDateString()) || ''
+  })
+
+  useEffect(() => {
+    localStorage.setItem('routine_' + new Date().toDateString(), JSON.stringify(routineChecked))
+  }, [routineChecked])
+
+  useEffect(() => {
+    localStorage.setItem('obs_' + new Date().toDateString(), observations)
+  }, [observations])
+
+  function toggleRoutine(i: number) {
+    setRoutineChecked((prev) => prev.map((v, idx) => idx === i ? !v : v))
+  }
 
   const allTasks = storeTasks.length > 0 ? storeTasks : DEMO_TASKS
   const visibleTasks = energy.showHeavyTasks
@@ -91,23 +136,16 @@ export default function Dashboard() {
     (t) => t.status !== 'concluida' && t.microetapas.some((s) => !s.concluida)
   )
 
-  const container = {
-    hidden: { opacity: 0 },
-    show: { opacity: 1, transition: { staggerChildren: 0.07 } },
-  }
-  const item = {
-    hidden: { opacity: 0, y: 12 },
-    show: { opacity: 1, y: 0 },
-  }
+  const monetizationTip = getTodayMonetizationTip()
+  const routineDone = routineChecked.filter(Boolean).length
+
+  const container = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.06 } } }
+  const item = { hidden: { opacity: 0, y: 10 }, show: { opacity: 1, y: 0 } }
 
   return (
     <div className="min-h-screen p-6 max-w-6xl mx-auto">
-      <motion.div
-        variants={container}
-        initial="hidden"
-        animate="show"
-        className="space-y-6"
-      >
+      <motion.div variants={container} initial="hidden" animate="show" className="space-y-5">
+
         {/* Day Focus */}
         <motion.div variants={item}>
           <DayFocusCard />
@@ -123,68 +161,122 @@ export default function Dashboard() {
         </motion.div>
 
         {/* Main grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Tasks column */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+
+          {/* Left: Tasks */}
           <motion.div variants={item} className="lg:col-span-2 space-y-4">
-            {/* Next action */}
-            {nextTask && !energy.showHeavyTasks && (
-              <NextActionCard task={nextTask} />
-            )}
+
+            {nextTask && !energy.showHeavyTasks && <NextActionCard task={nextTask} />}
 
             {/* Tasks */}
             <Card>
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div>
-                    <h2 className="text-sm font-semibold text-[var(--text-primary)]">Tarefas</h2>
+                    <h2 className="text-sm font-semibold text-[var(--text-primary)]">Tarefas do dia</h2>
                     <p className="text-[11px] text-[var(--text-muted)] mt-0.5">
                       {energy.showHeavyTasks
-                        ? `${visibleTasks.length} para hoje`
-                        : `${visibleTasks.length} tarefa(s) leve(s) — modo ${energy.label}`}
+                        ? `${visibleTasks.length} pendentes`
+                        : `${visibleTasks.length} leve(s) — modo ${energy.label}`}
                     </p>
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setCaptureOpen(true)}
-                  >
-                    <Plus size={14} />
-                    Nova
+                  <Button variant="ghost" size="sm" onClick={() => setCaptureOpen(true)}>
+                    <Plus size={14} /> Nova
                   </Button>
                 </div>
               </CardHeader>
               <CardBody className="pt-0 space-y-2">
                 {visibleTasks.length === 0 ? (
-                  <div className="text-center py-8">
-                    <p className="text-[var(--text-muted)] text-sm">
-                      {energy.showHeavyTasks
-                        ? 'Nenhuma tarefa pendente. 🎉'
-                        : 'Nenhuma tarefa leve para este modo. Descanse ou capture uma ideia.'}
-                    </p>
-                  </div>
+                  <p className="text-center py-6 text-sm text-[var(--text-muted)]">
+                    {energy.showHeavyTasks ? 'Nenhuma tarefa pendente.' : 'Nenhuma tarefa leve agora. Descanse.'}
+                  </p>
                 ) : (
-                  visibleTasks.map((task) => (
-                    <TaskCard key={task.id} task={task} />
-                  ))
+                  visibleTasks.slice(0, 3).map((task) => <TaskCard key={task.id} task={task} />)
                 )}
-                <Link href="/tarefas" className="flex items-center gap-1 text-xs text-[var(--text-muted)] hover:text-[var(--text-accent)] transition-colors pt-2">
-                  Ver todas as tarefas <ArrowRight size={11} />
+                <Link href="/tarefas" className="flex items-center gap-1 text-xs text-[var(--text-muted)] hover:text-[var(--text-accent)] transition-colors pt-1">
+                  Ver todas <ArrowRight size={11} />
                 </Link>
               </CardBody>
             </Card>
 
             {/* Week view */}
-            <motion.div variants={item}>
-              <Card>
-                <CardBody className="pt-5">
-                  <WeekView />
-                </CardBody>
-              </Card>
-            </motion.div>
+            <Card>
+              <CardBody className="pt-5">
+                <WeekView />
+              </CardBody>
+            </Card>
+
+            {/* Observations */}
+            <Card>
+              <CardHeader>
+                <h2 className="text-sm font-semibold text-[var(--text-primary)]">Observações do dia</h2>
+                <p className="text-[11px] text-[var(--text-muted)] mt-0.5">Espaço livre — guardado automaticamente</p>
+              </CardHeader>
+              <CardBody className="pt-0">
+                <textarea
+                  value={observations}
+                  onChange={(e) => setObservations(e.target.value)}
+                  placeholder="Como foi o dia? O que te ocupou a mente? O que funcionou ou não funcionou?"
+                  rows={4}
+                  className="w-full text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] bg-[var(--bg-base)] border border-[var(--border)] rounded-xl px-3 py-2.5 resize-none leading-relaxed focus:outline-none focus:border-indigo-300 focus:ring-2 focus:ring-indigo-100 transition-all"
+                />
+              </CardBody>
+            </Card>
           </motion.div>
 
           {/* Right column */}
           <motion.div variants={item} className="space-y-4">
+
+            {/* Morning routine */}
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <h2 className="text-sm font-semibold text-[var(--text-primary)]">Rotina da manhã</h2>
+                  <span className="text-[11px] font-medium text-indigo-500">{routineDone}/{MORNING_ROUTINE.length}</span>
+                </div>
+                <div className="mt-2 h-1 bg-gray-100 rounded-full overflow-hidden">
+                  <div
+                    className="h-full rounded-full bg-indigo-400 transition-all duration-500"
+                    style={{ width: `${(routineDone / MORNING_ROUTINE.length) * 100}%` }}
+                  />
+                </div>
+              </CardHeader>
+              <CardBody className="pt-0 space-y-1.5">
+                {MORNING_ROUTINE.map((item, i) => (
+                  <button
+                    key={item}
+                    onClick={() => toggleRoutine(i)}
+                    className="flex items-center gap-2.5 w-full text-left group py-0.5"
+                  >
+                    {routineChecked[i]
+                      ? <CheckSquare size={15} className="text-indigo-500 flex-shrink-0" />
+                      : <Square size={15} className="text-gray-300 group-hover:text-indigo-300 flex-shrink-0 transition-colors" />
+                    }
+                    <span className={`text-xs transition-colors ${routineChecked[i] ? 'text-[var(--text-muted)] line-through' : 'text-[var(--text-secondary)] group-hover:text-[var(--text-primary)]'}`}>
+                      {item}
+                    </span>
+                  </button>
+                ))}
+              </CardBody>
+            </Card>
+
+            {/* Quick monetization */}
+            <div
+              className="rounded-2xl p-4 border"
+              style={{ backgroundColor: `${monetizationTip.cor}08`, borderColor: `${monetizationTip.cor}20` }}
+            >
+              <div className="flex items-center gap-2 mb-2">
+                <monetizationTip.icon size={13} style={{ color: monetizationTip.cor }} />
+                <p className="text-[10px] font-bold uppercase tracking-wider" style={{ color: monetizationTip.cor }}>
+                  Monetizar hoje — {monetizationTip.tipo}
+                </p>
+              </div>
+              <p className="text-xs text-[var(--text-secondary)] leading-relaxed mb-3">{monetizationTip.texto}</p>
+              <Link href="/monetizacao" className="text-[10px] font-semibold hover:underline" style={{ color: monetizationTip.cor }}>
+                Ver todas as ideias →
+              </Link>
+            </div>
+
             {/* Clients */}
             <Card>
               <CardBody className="pt-5">
@@ -207,27 +299,21 @@ export default function Dashboard() {
                   <Link
                     key={idea.id}
                     href="/ideias"
-                    className="flex items-start gap-2 p-2.5 rounded-xl bg-[var(--bg-elevated)] border border-[var(--border)] hover:border-[var(--border-accent)]/40 transition-all group"
+                    className="flex items-start gap-2 p-2.5 rounded-xl bg-[var(--bg-elevated)] border border-[var(--border)] hover:border-amber-200 transition-all group"
                   >
-                    <Lightbulb size={13} className="text-yellow-400 flex-shrink-0 mt-0.5" />
+                    <Lightbulb size={13} className="text-amber-400 flex-shrink-0 mt-0.5" />
                     <p className="text-xs text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors leading-snug">
                       {idea.titulo}
                     </p>
                   </Link>
                 ))}
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="w-full mt-1"
-                  onClick={() => setCaptureOpen(true)}
-                >
-                  <Plus size={13} />
-                  Capturar ideia
+                <Button variant="ghost" size="sm" className="w-full mt-1" onClick={() => setCaptureOpen(true)}>
+                  <Plus size={13} /> Capturar ideia
                 </Button>
               </CardBody>
             </Card>
 
-            {/* Recorrências */}
+            {/* Fixed reminders */}
             <Card>
               <CardHeader>
                 <div className="flex items-center gap-2">
@@ -237,15 +323,9 @@ export default function Dashboard() {
               </CardHeader>
               <CardBody className="pt-0 space-y-2">
                 {RECURRENCES.map((r) => (
-                  <div
-                    key={r.texto}
-                    className="flex items-center justify-between p-2.5 rounded-xl bg-[var(--bg-elevated)] border border-[var(--border)]"
-                  >
+                  <div key={r.texto} className="flex items-center justify-between p-2.5 rounded-xl bg-[var(--bg-elevated)] border border-[var(--border)]">
                     <span className="text-xs text-[var(--text-primary)]">{r.texto}</span>
-                    <span
-                      className="text-[10px] px-2 py-0.5 rounded-full"
-                      style={{ backgroundColor: `${r.cor}20`, color: r.cor }}
-                    >
+                    <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ backgroundColor: `${r.cor}20`, color: r.cor }}>
                       {r.hora}
                     </span>
                   </div>

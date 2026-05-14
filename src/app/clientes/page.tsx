@@ -16,13 +16,26 @@ import {
   CheckCircle,
   ChevronDown,
   ChevronRight,
+  CreditCard,
+  Star,
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 
-const CLIENTS: Client[] = [
+interface ClientWithPayment extends Client {
+  payment_day: number
+  payment_status: 'pago' | 'pendente'
+}
+
+const INFLUENCERS_OPTICA = [
+  { dia: 'Terça', nome: 'Sabrina Sanchez', cor: '#EC4899' },
+  { dia: 'Quarta', nome: 'Waltencir', cor: '#8B5CF6' },
+  { dia: 'Quinta', nome: 'Thais Lage', cor: '#F59E0B' },
+]
+
+const CLIENTS: ClientWithPayment[] = [
   {
     id: '1',
-    nome: 'Pratique Academia',
+    nome: 'Academia Itabira Fit',
     cor: '#6EE7B7',
     retorno_financeiro: 1800,
     custo_cognitivo: 2,
@@ -36,6 +49,8 @@ const CLIENTS: Client[] = [
       'Reunião de pauta — quinta',
     ],
     tarefas_pendentes: 3,
+    payment_day: 5,
+    payment_status: 'pago',
     created_at: new Date().toISOString(),
   },
   {
@@ -53,6 +68,8 @@ const CLIENTS: Client[] = [
       'Criar stories da semana',
     ],
     tarefas_pendentes: 2,
+    payment_day: 10,
+    payment_status: 'pago',
     created_at: new Date().toISOString(),
   },
   {
@@ -70,6 +87,8 @@ const CLIENTS: Client[] = [
       'Fotos de produto — agendar',
     ],
     tarefas_pendentes: 2,
+    payment_day: 15,
+    payment_status: 'pendente',
     created_at: new Date().toISOString(),
   },
   {
@@ -89,6 +108,8 @@ const CLIENTS: Client[] = [
       'Enviar para aprovação',
     ],
     tarefas_pendentes: 4,
+    payment_day: 20,
+    payment_status: 'pendente',
     created_at: new Date().toISOString(),
   },
 ]
@@ -124,12 +145,14 @@ function getCogLoadAlert(load: number) {
   return { label: 'Baixo', color: '#34D399', icon: CheckCircle }
 }
 
-function ClientCard({ client }: { client: Client }) {
+function ClientCard({ client }: { client: ClientWithPayment }) {
   const [expanded, setExpanded] = useState(false)
   const cogLoad = getCogLoadAlert(client.custo_cognitivo)
   const roi = client.retorno_financeiro / (client.esforco * client.custo_cognitivo)
   const roiLabel = roi > 250 ? 'Excelente' : roi > 150 ? 'Bom' : roi > 80 ? 'Regular' : 'Atenção'
   const roiColor = roi > 250 ? '#34D399' : roi > 150 ? '#A78BFA' : roi > 80 ? '#FBBF24' : '#F87171'
+
+  const isPago = client.payment_status === 'pago'
 
   return (
     <Card>
@@ -222,15 +245,15 @@ function ClientCard({ client }: { client: Client }) {
 
         {/* Alert for high cognitive cost */}
         {client.custo_cognitivo >= 4 && (
-          <div className="flex items-start gap-2 p-2.5 rounded-xl bg-red-950/20 border border-red-900/20">
-            <AlertTriangle size={13} className="text-red-400 flex-shrink-0 mt-0.5" />
-            <p className="text-xs text-red-300">
-              Este cliente tem custo cognitivo muito alto. Considere renegociar escopo ou valor.
+          <div className="flex items-start gap-2 p-2.5 rounded-xl bg-red-50 border border-red-200">
+            <AlertTriangle size={13} className="text-red-500 flex-shrink-0 mt-0.5" />
+            <p className="text-xs text-red-600">
+              Custo cognitivo alto. Considere renegociar escopo ou valor.
             </p>
           </div>
         )}
 
-        {/* Expanded: next actions */}
+        {/* Expanded: next actions + payment + influencers */}
         <AnimatePresence>
           {expanded && (
             <motion.div
@@ -239,16 +262,61 @@ function ClientCard({ client }: { client: Client }) {
               exit={{ opacity: 0, height: 0 }}
               className="overflow-hidden"
             >
-              <div className="pt-2 border-t border-[var(--border)] space-y-2">
-                <p className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider">
-                  Próximas ações
-                </p>
-                {client.proximas_acoes.map((action, i) => (
-                  <div key={i} className="flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: client.cor }} />
-                    <span className="text-xs text-[var(--text-secondary)]">{action}</span>
+              <div className="pt-2 border-t border-[var(--border)] space-y-4">
+                {/* Próximas ações */}
+                <div className="space-y-2">
+                  <p className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider">
+                    Próximas ações
+                  </p>
+                  {client.proximas_acoes.map((action, i) => (
+                    <div key={i} className="flex items-center gap-2">
+                      <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: client.cor }} />
+                      <span className="text-xs text-[var(--text-secondary)]">{action}</span>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Pagamento */}
+                <div className="space-y-2">
+                  <p className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider flex items-center gap-1">
+                    <CreditCard size={9} /> Pagamento
+                  </p>
+                  <div className="flex items-center justify-between p-2.5 rounded-xl border border-[var(--border)] bg-[var(--bg-hover)]">
+                    <span className="text-xs text-[var(--text-secondary)]">
+                      Dia {client.payment_day} de cada mês
+                    </span>
+                    <span
+                      className="text-[10px] font-semibold px-2 py-0.5 rounded-full"
+                      style={{
+                        backgroundColor: isPago ? '#34D39922' : '#F8717122',
+                        color: isPago ? '#34D399' : '#F87171',
+                      }}
+                    >
+                      {isPago ? 'Pago' : 'Pendente'}
+                    </span>
                   </div>
-                ))}
+                </div>
+
+                {/* Influencers da semana — only for Óptica Igor Giordano */}
+                {client.id === '3' && (
+                  <div className="space-y-2">
+                    <p className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider flex items-center gap-1">
+                      <Star size={9} className="text-amber-400" /> Influencers da semana
+                    </p>
+                    {INFLUENCERS_OPTICA.map((inf) => (
+                      <div key={inf.nome} className="flex items-center gap-3 p-2.5 rounded-xl border border-[var(--border)] bg-white">
+                        <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: inf.cor }} />
+                        <span className="text-xs text-[var(--text-secondary)] flex-1">{inf.nome}</span>
+                        <span
+                          className="text-[10px] font-medium px-2 py-0.5 rounded-full border"
+                          style={{ backgroundColor: `${inf.cor}10`, borderColor: `${inf.cor}30`, color: inf.cor }}
+                        >
+                          {inf.dia}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </motion.div>
           )}

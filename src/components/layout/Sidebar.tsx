@@ -7,18 +7,22 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
   LayoutDashboard, Zap, Lightbulb, Users, FileText,
-  Sparkles, BookMarked, ChevronLeft, ChevronRight, Network,
+  Sparkles, BookMarked, ChevronLeft, ChevronRight,
+  User, DollarSign, CalendarDays, Printer,
 } from 'lucide-react'
 
 const navItems = [
   { href: '/', icon: LayoutDashboard, label: 'Dashboard' },
-  { href: '/captura', icon: Zap, label: 'Captura' },
+  { href: '/captura', icon: Zap, label: 'Captura Mental' },
   { href: '/ideias', icon: Lightbulb, label: 'Banco de Ideias' },
   { href: '/conteudo', icon: FileText, label: 'Conteúdo' },
-  { href: '/prompts', icon: BookMarked, label: 'Prompts' },
   { href: '/clientes', icon: Users, label: 'Clientes' },
+  { href: '/calendario', icon: CalendarDays, label: 'Calendário' },
+  { href: '/monetizacao', icon: DollarSign, label: 'Monetização' },
+  { href: '/impressos', icon: Printer, label: 'Impressos' },
+  { href: '/prompts', icon: BookMarked, label: 'Prompts' },
   { href: '/crm', icon: Sparkles, label: 'CRM Criativo' },
-  { href: '/mapa', icon: Network, label: 'Mapa Mental' },
+  { href: '/sobre', icon: User, label: 'Sobre' },
 ]
 
 export function Sidebar() {
@@ -47,7 +51,8 @@ export function Sidebar() {
         {!sidebarCollapsed && (
           <div>
             <p className="text-[var(--text-primary)] font-semibold text-sm leading-tight">Lorenna OS</p>
-            <p className="text-[var(--text-muted)] text-[10px]">Sistema Cognitivo</p>
+            <p className="text-[var(--text-muted)] text-[10px]">Agência Logue</p>
+            <p className="text-[var(--text-muted)] text-[10px]">@lorennagn</p>
           </div>
         )}
       </div>
@@ -92,30 +97,6 @@ export function Sidebar() {
           )
         })}
       </nav>
-
-      {/* Energy quick-switch */}
-      {!sidebarCollapsed && (
-        <div className="px-3 pb-3">
-          <p className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider mb-2 px-1 font-medium">Trocar energia</p>
-          <div className="grid grid-cols-4 gap-1">
-            {Object.values(ENERGY_CONFIGS).map((e) => (
-              <button
-                key={e.id}
-                onClick={() => setEnergyMode(e.id)}
-                title={e.label}
-                className={cn(
-                  'h-8 rounded-lg text-base flex items-center justify-center transition-all',
-                  energyMode === e.id
-                    ? 'bg-indigo-50 border border-indigo-200 scale-110'
-                    : 'bg-[var(--bg-base)] hover:bg-[var(--bg-hover)] border border-transparent'
-                )}
-              >
-                {e.emoji}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
 
       {/* Collapse */}
       <div className={cn('p-3 border-t border-[var(--border)] flex', sidebarCollapsed ? 'justify-center' : 'justify-end')}>
