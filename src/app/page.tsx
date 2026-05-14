@@ -1,8 +1,10 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
+import { supabase } from '@/lib/supabase'
 import { useLorennStore } from '@/lib/store'
 import { ENERGY_CONFIGS } from '@/lib/energy'
+import type { Task } from '@/lib/types'
 import { EnergySelector } from '@/components/dashboard/EnergySelector'
 import { DayFocusCard } from '@/components/dashboard/DayFocusCard'
 import { WeekView } from '@/components/dashboard/WeekView'
@@ -90,19 +92,34 @@ const RECURRENCES = [
 ]
 
 export default function Dashboard() {
-  const { energyMode, tasks: storeTasks, setCaptureOpen } = useLorennStore()
+  const { energyMode, setCaptureOpen } = useLorennStore()
   const energy = ENERGY_CONFIGS[energyMode]
 
+  const [dbTasks, setDbTasks] = useState<Task[]>([])
   const [observations, setObservations] = useState(() => {
     if (typeof window === 'undefined') return ''
     return localStorage.getItem('obs_' + new Date().toDateString()) || ''
   })
 
+  const loadTasks = useCallback(async () => {
+    const { data } = await supabase
+      .from('tarefas')
+      .select('*, microetapas(*)')
+      .neq('status', 'concluida')
+      .order('created_at', { ascending: false })
+      .limit(10)
+    if (data && data.length > 0) {
+      setDbTasks(data.map(t => ({ ...t, microetapas: t.microetapas ?? [] })) as Task[])
+    }
+  }, [])
+
+  useEffect(() => { loadTasks() }, [loadTasks])
+
   useEffect(() => {
     localStorage.setItem('obs_' + new Date().toDateString(), observations)
   }, [observations])
 
-  const allTasks = storeTasks.length > 0 ? storeTasks : DEMO_TASKS
+  const allTasks = dbTasks.length > 0 ? dbTasks : DEMO_TASKS
   const visibleTasks = energy.showHeavyTasks
     ? allTasks.filter((t) => t.status !== 'concluida')
     : allTasks.filter(
