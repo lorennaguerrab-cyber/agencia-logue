@@ -1,127 +1,102 @@
 @import "tailwindcss";
 
-/* Sobrescreve a escala pink do Tailwind com as cores Papel da Lola */
-@theme {
-  --color-pink-50:  #FFE3EE;
-  --color-pink-100: #FFC7DD;
-  --color-pink-200: #FFB3CE;
-  --color-pink-300: #FF9BBF;
-  --color-pink-400: #FF8BB6;
-  --color-pink-500: #FF78B0;
-  --color-pink-600: #E8538D;
-  --color-pink-700: #C44878;
-  --color-pink-800: #A03060;
-  --color-pink-900: #7A1F47;
-}
+/* ============================================================
+   LOGUE OS — Design Tokens
+   Dark · editorial · premium · accent amarelo #e8ff4d
+   ============================================================ */
 
 :root {
-  /* ── Papel da Lola — paleta oficial ── */
-  --pink:        #FF78B0;
-  --pink-soft:   #FFC7DD;
-  --pink-tint:   #FFE3EE;
-  --pink-deep:   #E8538D;
+  /* Surfaces */
+  --bg:        #0a0a0a;
+  --surface-1: #111111;
+  --surface-2: #181818;
+  --surface-3: #1f1f1f;
 
-  --ink:         #2B2B2B;
-  --ink-soft:    #4A4A4A;
-  --gray:        #908F8E;
-  --gray-light:  #EAEAEA;
-  --offwhite:    #F7F3F0;
-  --offwhite-2:  #FFFCFA;
-  --beige:       #FFF9E9;
+  /* Accent — amarelo Logue */
+  --accent:         #e8ff4d;
+  --accent-dim:     #b9cc3d;
+  --accent-ghost:   rgba(232, 255, 77, 0.10);
+  --accent-ghost-2: rgba(232, 255, 77, 0.16);
 
-  /* System aliases */
-  --bg-base:        #F7F3F0;
-  --bg-surface:     #FFFFFF;
-  --bg-elevated:    #FFFCFA;
-  --bg-hover:       #EAEAEA;
-  --bg-inset:       #F7F3F0;
+  /* Text */
+  --fg-1: #f4f4f2;
+  --fg-2: rgba(244, 244, 242, 0.62);
+  --fg-3: rgba(244, 244, 242, 0.40);
+  --fg-4: rgba(244, 244, 242, 0.24);
 
-  --accent:         #FF78B0;
-  --accent-muted:   #FFC7DD;
-  --accent-glow:    rgba(255, 120, 176, 0.12);
-  --accent-soft:    rgba(255, 120, 176, 0.07);
+  /* Borders */
+  --border:        #2a2a2a;
+  --border-soft:   #1f1f1f;
+  --border-strong: #383838;
 
-  --text-primary:   #2B2B2B;
-  --text-secondary: #4A4A4A;
-  --text-muted:     #908F8E;
-  --text-accent:    #E8538D;
+  /* Status */
+  --green:        #4dff91;
+  --yellow:       #e8ff4d;
+  --red:          #ff4d4d;
+  --blue:         #4d9fff;
+  --green-ghost:  rgba(77, 255, 145, 0.12);
+  --yellow-ghost: rgba(232, 255, 77, 0.12);
+  --red-ghost:    rgba(255, 77, 77, 0.12);
+  --blue-ghost:   rgba(77, 159, 255, 0.12);
 
-  --border:         #EAEAEA;
-  --border-subtle:  rgba(0, 0, 0, 0.04);
-  --border-accent:  #FF78B0;
-  --border-soft:    #FFC7DD;
+  /* Type */
+  --font-display: var(--font-syne), "Helvetica Neue", sans-serif;
+  --font-body:    var(--font-poppins), "Helvetica Neue", sans-serif;
+  --font-mono:    ui-monospace, "SF Mono", Menlo, monospace;
 
-  /* No shadows (Papel da Lola rule) */
-  --shadow-xs: none;
-  --shadow-sm: none;
-  --shadow-md: none;
-  --shadow-lg: none;
+  /* Radius */
+  --r-sm:   8px;
+  --r-md:   12px;
+  --r-lg:   16px;
+  --r-pill: 999px;
 
-  --success: #7FB68C;
-  --warning: #E89B4C;
-  --danger:  #C44878;
-  --info:    #A89AC9;
+  /* Spacing 8pt */
+  --s1: 8px;  --s2: 16px; --s3: 24px; --s4: 32px;
+  --s5: 40px; --s6: 48px; --s7: 64px;
+
+  /* Motion */
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --dur:  200ms;
+
+  /* Layout */
+  --sidebar-w: 248px;
+  --topbar-h:  64px;
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-html {
-  font-size: 16px;
+html, body {
+  background: var(--bg);
+  color: var(--fg-1);
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-body {
-  background-color: var(--bg-base);
-  color: var(--text-primary);
-  font-family: var(--font-poppins), 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  min-height: 100vh;
-  overflow-x: hidden;
-}
+a { color: inherit; text-decoration: none; }
+button { font-family: inherit; cursor: pointer; }
+input, textarea, select { font-family: inherit; color: var(--fg-1); }
+::selection { background: var(--accent); color: #0a0a0a; }
 
-h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-syne), var(--font-poppins), sans-serif;
-}
-
-::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar { width: 10px; height: 10px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 999px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.18); }
+::-webkit-scrollbar-thumb { background: #242424; border-radius: 999px; border: 2px solid var(--bg); }
+::-webkit-scrollbar-thumb:hover { background: #303030; }
 
-::selection { background: var(--accent-glow); color: var(--accent); }
-:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
-
-.glass {
-  background: rgba(255,255,255,0.9);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid var(--border);
+/* ── Typography ── */
+.os-display { font-family: var(--font-display); font-weight: 800; letter-spacing: -0.02em; }
+.os-title   { font-family: var(--font-display); font-weight: 700; letter-spacing: -0.015em; }
+.os-eyebrow {
+  font-family: var(--font-body); font-weight: 500; font-size: 11px;
+  letter-spacing: 0.16em; text-transform: uppercase; color: var(--fg-3);
 }
 
-.gradient-text {
-  background: linear-gradient(135deg, #FF78B0 0%, #E8538D 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-@keyframes pulse-dot {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.4; transform: scale(0.75); }
-}
-.pulse-dot { animation: pulse-dot 2s ease-in-out infinite; }
-
-@keyframes fade-in {
+/* ── Fade-in animation ── */
+@keyframes os-view-in {
   from { opacity: 0; transform: translateY(6px); }
-  to { opacity: 1; transform: translateY(0); }
+  to   { opacity: 1; transform: none; }
 }
-.fade-in { animation: fade-in 0.25s ease forwards; }
-
-input, textarea, select {
-  background: transparent;
-  border: none;
-  outline: none;
-  color: var(--text-primary);
-  font-family: inherit;
-}
-input::placeholder, textarea::placeholder { color: var(--text-muted); }
+.os-view-in { animation: os-view-in 320ms var(--ease); }

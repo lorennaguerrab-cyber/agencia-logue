@@ -1,338 +1,329 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
-import { supabase } from '@/lib/supabase'
-import { useLorennStore } from '@/lib/store'
-import { ENERGY_CONFIGS } from '@/lib/energy'
-import type { Task } from '@/lib/types'
-import { EnergySelector } from '@/components/dashboard/EnergySelector'
-import { DayFocusCard } from '@/components/dashboard/DayFocusCard'
-import { WeekView } from '@/components/dashboard/WeekView'
-import { TaskCard, NextActionCard } from '@/components/dashboard/TaskCard'
-import { ClientsWidget } from '@/components/dashboard/ClientsWidget'
-import { RotinasAncora } from '@/components/dashboard/RotinasAncora'
-import { WeekProgress } from '@/components/dashboard/WeekProgress'
-import { Card, CardBody, CardHeader } from '@/components/ui/Card'
-import { Button } from '@/components/ui/Button'
-import {
-  Plus, Zap, Lightbulb, ArrowRight, Bell,
-  Sparkles, ShoppingBag, FileText,
-} from 'lucide-react'
+import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { motion } from 'framer-motion'
+import { useTopbar } from '@/lib/topbar-context'
+import {
+  clients,
+  deliveries,
+  monthlyRevenue,
+  activeClients,
+  overdueCount,
+  totalCosts,
+  clientById,
+  userById,
+  getPlanLabel,
+  daysUntil,
+  fmt,
+} from '@/lib/db'
+import {
+  Wallet,
+  Users,
+  AlertTriangle,
+  TrendingUp,
+  Sparkles,
+  ArrowRight,
+  ChevronRight,
+} from 'lucide-react'
 
-const DEMO_TASKS = [
-  {
-    id: '1',
-    titulo: 'Criar roteiro do reel sobre branding',
-    status: 'pendente' as const,
-    prioridade: 'alta' as const,
-    energia_necessaria: ['criativa' as const],
-    microetapas: [
-      { id: 'ms1', task_id: '1', ordem: 1, descricao: 'Definir gancho principal', concluida: true, tempo_estimado: 5 },
-      { id: 'ms2', task_id: '1', ordem: 2, descricao: 'Escrever script de 30s', concluida: false, tempo_estimado: 15 },
-      { id: 'ms3', task_id: '1', ordem: 3, descricao: 'Revisar e ajustar ritmo', concluida: false, tempo_estimado: 10 },
-    ],
-    categoria: 'conteudo' as const,
-    recorrente: false,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: '2',
-    titulo: 'Entregar posts semana Academia Itabira Fit',
-    status: 'em_progresso' as const,
-    prioridade: 'urgente' as const,
-    energia_necessaria: ['operacional' as const],
-    microetapas: [
-      { id: 'ms4', task_id: '2', ordem: 1, descricao: 'Criar artes no Canva', concluida: true, tempo_estimado: 20 },
-      { id: 'ms5', task_id: '2', ordem: 2, descricao: 'Escrever legendas', concluida: false, tempo_estimado: 15 },
-      { id: 'ms6', task_id: '2', ordem: 3, descricao: 'Agendar no Meta', concluida: false, tempo_estimado: 10 },
-    ],
-    categoria: 'cliente' as const,
-    cliente_id: '1',
-    recorrente: true,
-    recorrencia: 'semanal',
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: '3',
-    titulo: 'Responder e-mails pendentes',
-    status: 'pendente' as const,
-    prioridade: 'media' as const,
-    energia_necessaria: ['operacional' as const, 'social' as const, 'cansada' as const],
-    microetapas: [],
-    categoria: 'administrativo' as const,
-    recorrente: false,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-]
-
-const DEMO_IDEAS = [
-  { id: 'i1', titulo: '"Domingo é o único dia em que tenho 47 ideias e zero energia pra executar"', created_at: new Date().toISOString() },
-  { id: 'i2', titulo: 'Série: Mulheres que viraram marca — episódio 1', created_at: new Date().toISOString() },
-  { id: 'i3', titulo: 'Análise de marca: Por que a Duolingo domina o TikTok', created_at: new Date().toISOString() },
-]
-
-const QUICK_MONETIZATION = [
-  { texto: 'Story com link de afiliado (Shopee)', tipo: 'Afiliado', cor: '#EF4444', icon: ShoppingBag },
-  { texto: 'Ofereça revisão de bio por R$97 via DM', tipo: 'Consultoria', cor: '#EC4899', icon: Sparkles },
-  { texto: 'Compartilhe link da newsletter no Stories', tipo: 'Newsletter', cor: '#FF6719', icon: FileText },
-  { texto: 'Prospecte 1 empresa local para a agência', tipo: 'Agência', cor: '#10B981', icon: Zap },
-]
-
-function getTodayMonetizationTip() {
-  return QUICK_MONETIZATION[new Date().getDate() % QUICK_MONETIZATION.length]
+const STATUS_STYLE = {
+  ativo:     { color: 'var(--green)',  background: 'var(--green-ghost)',  borderColor: 'rgba(77,255,145,.24)' },
+  reajuste:  { color: 'var(--yellow)', background: 'var(--yellow-ghost)', borderColor: 'rgba(232,255,77,.24)' },
+  renovacao: { color: 'var(--red)',    background: 'var(--red-ghost)',    borderColor: 'rgba(255,77,77,.24)'  },
 }
 
-const RECURRENCES = [
-  { texto: 'Tarefas escolares — Mateus e Murilo', hora: 'Antes das 10h30', cor: '#F9A8D4' },
-  { texto: 'Futebol — Mateus e Murilo', hora: 'Qua e Sex às 8h20', cor: '#6EE7B7' },
-]
+const STATUS_LABEL = {
+  ativo:     'Ativo',
+  reajuste:  'Reajuste',
+  renovacao: 'Renovação',
+}
 
-export default function Dashboard() {
-  const { energyMode, setCaptureOpen } = useLorennStore()
-  const energy = ENERGY_CONFIGS[energyMode]
-
-  const [dbTasks, setDbTasks] = useState<Task[]>([])
-  const [recentIdeas, setRecentIdeas] = useState<{ id: string; titulo: string }[]>([])
-  const [observations, setObservations] = useState(() => {
-    if (typeof window === 'undefined') return ''
-    return localStorage.getItem('obs_' + new Date().toDateString()) || ''
-  })
-
-  const loadTasks = useCallback(async () => {
-    const { data } = await supabase
-      .from('tarefas')
-      .select('*, microetapas(*)')
-      .neq('status', 'concluida')
-      .order('created_at', { ascending: false })
-      .limit(10)
-    if (data && data.length > 0) {
-      setDbTasks(data.map(t => ({ ...t, microetapas: t.microetapas ?? [] })) as Task[])
-    }
-  }, [])
-
-  useEffect(() => { loadTasks() }, [loadTasks])
-
-  useEffect(() => {
-    supabase.from('ideias').select('id,titulo').order('created_at', { ascending: false }).limit(3)
-      .then(({ data }) => { if (data && data.length > 0) setRecentIdeas(data) })
-  }, [])
-
-  useEffect(() => {
-    localStorage.setItem('obs_' + new Date().toDateString(), observations)
-  }, [observations])
-
-  const allTasks = dbTasks.length > 0 ? dbTasks : DEMO_TASKS
-  const visibleTasks = energy.showHeavyTasks
-    ? allTasks.filter((t) => t.status !== 'concluida')
-    : allTasks.filter(
-        (t) =>
-          t.status !== 'concluida' &&
-          (t.microetapas.length === 0 || t.microetapas.length <= 2) &&
-          t.prioridade !== 'baixa'
-      )
-
-  const nextTask = allTasks.find(
-    (t) => t.status !== 'concluida' && t.microetapas.some((s) => !s.concluida)
+function StatusChip({ status }: { status: 'ativo' | 'reajuste' | 'renovacao' }) {
+  const s = STATUS_STYLE[status]
+  return (
+    <span style={{
+      display: 'inline-flex', alignItems: 'center', gap: 6,
+      padding: '4px 10px', borderRadius: 999,
+      fontSize: 11, fontWeight: 500,
+      border: '1px solid',
+      color: s.color, background: s.background, borderColor: s.borderColor,
+    }}>
+      <span style={{ width: 5, height: 5, borderRadius: '50%', background: s.color, display: 'inline-block' }} />
+      {STATUS_LABEL[status]}
+    </span>
   )
+}
 
-  const monetizationTip = getTodayMonetizationTip()
+export default function DashboardPage() {
+  const router = useRouter()
+  const { setConfig } = useTopbar()
 
-  const container = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.06 } } }
-  const item = { hidden: { opacity: 0, y: 10 }, show: { opacity: 1, y: 0 } }
+  useEffect(() => {
+    setConfig({
+      title: 'Dashboard',
+      subtitle: 'Visão geral · junho 2026',
+      actions: (
+        <button
+          onClick={() => router.push('/ia')}
+          style={{
+            display: 'inline-flex', alignItems: 'center', gap: 8,
+            padding: '10px 16px', borderRadius: 'var(--r-sm)',
+            background: 'var(--accent)', color: '#0a0a0a',
+            fontSize: 13, fontWeight: 600,
+            border: '1px solid transparent', cursor: 'pointer',
+          }}
+        >
+          <Sparkles size={16} /> Gerar conteúdo
+        </button>
+      ),
+    })
+  }, [setConfig, router])
+
+  // KPI data
+  const revenue    = monthlyRevenue()
+  const active     = activeClients()
+  const overdue    = overdueCount()
+  const costs      = totalCosts()
+  const margin     = Math.round(((revenue - costs) / revenue) * 100)
+  const netAmount  = revenue - costs
+
+  // Urgent deliveries: non-delivered, sorted by due date, top 4
+  const urgentDeliveries = deliveries
+    .filter(d => d.col !== 'entregue')
+    .sort((a, b) => new Date(a.due).getTime() - new Date(b.due).getTime())
+    .slice(0, 4)
+
+  // Contract renewals: clients with daysUntil(renew) <= 35, sorted
+  const renewalClients = clients
+    .filter(c => daysUntil(c.renew) <= 35)
+    .sort((a, b) => daysUntil(a.renew) - daysUntil(b.renew))
+
+  function dueDotColor(d: typeof deliveries[0]) {
+    if (d.late) return 'var(--red)'
+    const days = daysUntil(d.due)
+    if (days <= 2) return 'var(--yellow)'
+    return 'var(--fg-4)'
+  }
+
+  function dueLabel(d: typeof deliveries[0]) {
+    if (d.late) {
+      const diff = daysUntil(d.due)
+      return `${Math.abs(diff)}d atraso`
+    }
+    const diff = daysUntil(d.due)
+    if (diff === 0) return 'hoje'
+    return `${diff}d`
+  }
+
+  function dueLabelColor(d: typeof deliveries[0]) {
+    if (d.late) return 'var(--red)'
+    const days = daysUntil(d.due)
+    if (days <= 2) return 'var(--yellow)'
+    return 'var(--fg-3)'
+  }
+
+  function renewDotColor(days: number) {
+    if (days < 0) return 'var(--red)'
+    if (days <= 7) return 'var(--yellow)'
+    return 'var(--fg-4)'
+  }
 
   return (
-    <div className="min-h-screen p-6 max-w-6xl mx-auto">
-      <motion.div variants={container} initial="hidden" animate="show" className="space-y-5">
+    <div style={{ maxWidth: 1180, margin: '0 auto' }} className="os-view-in">
 
-        {/* Day Focus */}
-        <motion.div variants={item}>
-          <DayFocusCard />
-        </motion.div>
+      {/* KPI row */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 20 }}>
 
-        {/* Energy Selector */}
-        <motion.div variants={item}>
-          <Card>
-            <CardBody className="pt-5">
-              <EnergySelector />
-            </CardBody>
-          </Card>
-        </motion.div>
+        {/* Receita mensal */}
+        <div style={{ background: 'var(--surface-1)', border: '1px solid var(--border)', borderRadius: 'var(--r-lg)', padding: 20, display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <span style={{ fontSize: 12, color: 'var(--fg-3)' }}>Receita mensal</span>
+            <span style={{ width: 34, height: 34, borderRadius: 'var(--r-sm)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--surface-2)', color: 'var(--fg-2)' }}>
+              <Wallet size={17} />
+            </span>
+          </div>
+          <div className="os-title" style={{ fontSize: 28, letterSpacing: '-0.02em', lineHeight: 1 }}>{fmt(revenue)}</div>
+          <span style={{ fontSize: 11.5, display: 'inline-flex', alignItems: 'center', gap: 4, color: 'var(--fg-3)' }}>+0% vs. maio</span>
+        </div>
 
-        {/* Main grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+        {/* Clientes ativos */}
+        <div style={{ background: 'var(--surface-1)', border: '1px solid var(--border)', borderRadius: 'var(--r-lg)', padding: 20, display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <span style={{ fontSize: 12, color: 'var(--fg-3)' }}>Clientes ativos</span>
+            <span style={{ width: 34, height: 34, borderRadius: 'var(--r-sm)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--surface-2)', color: 'var(--fg-2)' }}>
+              <Users size={17} />
+            </span>
+          </div>
+          <div className="os-title" style={{ fontSize: 28, letterSpacing: '-0.02em', lineHeight: 1 }}>{active.length}</div>
+          <span style={{ fontSize: 11.5, display: 'inline-flex', alignItems: 'center', gap: 4, color: 'var(--red)' }}>
+            {clients.length - active.length} em renovação
+          </span>
+        </div>
 
-          {/* Left: Tasks */}
-          <motion.div variants={item} className="lg:col-span-2 space-y-4">
+        {/* Entregas atrasadas */}
+        <div style={{ background: 'var(--surface-1)', border: '1px solid var(--border)', borderRadius: 'var(--r-lg)', padding: 20, display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <span style={{ fontSize: 12, color: 'var(--fg-3)' }}>Entregas atrasadas</span>
+            <span style={{ width: 34, height: 34, borderRadius: 'var(--r-sm)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--surface-2)', color: 'var(--fg-2)' }}>
+              <AlertTriangle size={17} />
+            </span>
+          </div>
+          <div className="os-title" style={{ fontSize: 28, letterSpacing: '-0.02em', lineHeight: 1 }}>{overdue}</div>
+          <span style={{ fontSize: 11.5, display: 'inline-flex', alignItems: 'center', gap: 4, color: 'var(--yellow)' }}>precisam de ação</span>
+        </div>
 
-            {nextTask && !energy.showHeavyTasks && <NextActionCard task={nextTask} />}
+        {/* Margem média */}
+        <div style={{ background: 'var(--surface-1)', border: '1px solid var(--border)', borderRadius: 'var(--r-lg)', padding: 20, display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <span style={{ fontSize: 12, color: 'var(--fg-3)' }}>Margem média</span>
+            <span style={{ width: 34, height: 34, borderRadius: 'var(--r-sm)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--surface-2)', color: 'var(--fg-2)' }}>
+              <TrendingUp size={17} />
+            </span>
+          </div>
+          <div className="os-title" style={{ fontSize: 28, letterSpacing: '-0.02em', lineHeight: 1 }}>{margin}%</div>
+          <span style={{ fontSize: 11.5, display: 'inline-flex', alignItems: 'center', gap: 4, color: 'var(--green)' }}>
+            líquido {fmt(netAmount)}
+          </span>
+        </div>
+      </div>
 
-            {/* Tasks */}
-            <Card>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h2 className="text-sm font-semibold text-[var(--text-primary)]">Tarefas do dia</h2>
-                    <p className="text-[11px] text-[var(--text-muted)] mt-0.5">
-                      {energy.showHeavyTasks
-                        ? `${visibleTasks.length} pendentes`
-                        : `${visibleTasks.length} leve(s) — modo ${energy.label}`}
-                    </p>
-                  </div>
-                  <Button variant="ghost" size="sm" onClick={() => setCaptureOpen(true)}>
-                    <Plus size={14} /> Nova
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardBody className="pt-0 space-y-2">
-                {visibleTasks.length === 0 ? (
-                  <p className="text-center py-6 text-sm text-[var(--text-muted)]">
-                    {energy.showHeavyTasks ? 'Nenhuma tarefa pendente.' : 'Nenhuma tarefa leve agora. Descanse.'}
-                  </p>
-                ) : (
-                  visibleTasks.slice(0, 3).map((task) => <TaskCard key={task.id} task={task} />)
-                )}
-                <Link href="/tarefas" className="flex items-center gap-1 text-xs text-[var(--text-muted)] hover:text-[var(--text-accent)] transition-colors pt-1">
-                  Ver todas <ArrowRight size={11} />
-                </Link>
-              </CardBody>
-            </Card>
+      {/* Main 2-col split */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: 20, alignItems: 'start' }}>
 
-            {/* Week view */}
-            <Card>
-              <CardBody className="pt-5">
-                <WeekView />
-              </CardBody>
-            </Card>
-
-            {/* Observations */}
-            <Card>
-              <CardHeader>
-                <h2 className="text-sm font-semibold text-[var(--text-primary)]">Observações do dia</h2>
-                <p className="text-[11px] text-[var(--text-muted)] mt-0.5">Espaço livre — guardado automaticamente</p>
-              </CardHeader>
-              <CardBody className="pt-0">
-                <textarea
-                  value={observations}
-                  onChange={(e) => setObservations(e.target.value)}
-                  placeholder="Como foi o dia? O que te ocupou a mente? O que funcionou ou não funcionou?"
-                  rows={4}
-                  className="w-full text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] bg-[var(--bg-base)] border border-[var(--border)] rounded-xl px-3 py-2.5 resize-none leading-relaxed focus:outline-none focus:border-pink-300 focus:ring-2 focus:ring-pink-100 transition-all"
-                />
-              </CardBody>
-            </Card>
-          </motion.div>
-
-          {/* Right column */}
-          <motion.div variants={item} className="space-y-4">
-
-            {/* Rotinas Âncora */}
-            <Card>
-              <CardBody className="pt-5">
-                <RotinasAncora />
-              </CardBody>
-            </Card>
-
-            {/* Quick monetization */}
-            <div
-              className="rounded-2xl p-4 border"
-              style={{ backgroundColor: `${monetizationTip.cor}08`, borderColor: `${monetizationTip.cor}20` }}
+        {/* LEFT — Client table */}
+        <div style={{ background: 'var(--surface-1)', border: '1px solid var(--border)', borderRadius: 'var(--r-lg)', overflow: 'hidden' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '18px 20px 14px' }}>
+            <span className="os-title" style={{ fontSize: 15, color: 'var(--fg-1)' }}>Carteira de clientes</span>
+            <Link href="/clientes" style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 12, color: 'var(--fg-3)', transition: 'color var(--dur)' }}
+              onMouseEnter={e => (e.currentTarget as HTMLAnchorElement).style.color = 'var(--accent)'}
+              onMouseLeave={e => (e.currentTarget as HTMLAnchorElement).style.color = 'var(--fg-3)'}
             >
-              <div className="flex items-center gap-2 mb-2">
-                <monetizationTip.icon size={13} style={{ color: monetizationTip.cor }} />
-                <p className="text-[10px] font-bold uppercase tracking-wider" style={{ color: monetizationTip.cor }}>
-                  Monetizar hoje — {monetizationTip.tipo}
-                </p>
-              </div>
-              <p className="text-xs text-[var(--text-secondary)] leading-relaxed mb-3">{monetizationTip.texto}</p>
-              <Link href="/monetizacao" className="text-[10px] font-semibold hover:underline" style={{ color: monetizationTip.cor }}>
-                Ver todas as ideias →
+              Ver todos <ArrowRight size={13} />
+            </Link>
+          </div>
+          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <thead>
+              <tr>
+                {['Cliente / Segmento', 'Plano', 'Valor', 'Status'].map(col => (
+                  <th key={col} style={{ textAlign: 'left', fontSize: 11, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--fg-3)', padding: '12px 16px', borderBottom: '1px solid var(--border)' }}>
+                    {col}
+                  </th>
+                ))}
+                <th style={{ width: 32, borderBottom: '1px solid var(--border)' }} />
+              </tr>
+            </thead>
+            <tbody>
+              {clients.map(c => (
+                <tr
+                  key={c.id}
+                  style={{ transition: 'background var(--dur)', cursor: 'pointer' }}
+                  onMouseEnter={e => (e.currentTarget as HTMLTableRowElement).style.background = 'var(--surface-2)'}
+                  onMouseLeave={e => (e.currentTarget as HTMLTableRowElement).style.background = 'transparent'}
+                  onClick={() => window.location.href = `/clientes/${c.id}`}
+                >
+                  <td style={{ padding: '14px 16px', borderBottom: '1px solid var(--border-soft)', fontSize: 13, verticalAlign: 'middle' }}>
+                    <div style={{ fontWeight: 500, color: 'var(--fg-1)' }}>{c.name}</div>
+                    <div style={{ fontSize: 11.5, color: 'var(--fg-3)', marginTop: 2 }}>{c.segment}</div>
+                  </td>
+                  <td style={{ padding: '14px 16px', borderBottom: '1px solid var(--border-soft)', fontSize: 13, color: 'var(--fg-2)', verticalAlign: 'middle' }}>
+                    {getPlanLabel(c)}
+                  </td>
+                  <td style={{ padding: '14px 16px', borderBottom: '1px solid var(--border-soft)', fontSize: 13, color: 'var(--fg-1)', fontVariantNumeric: 'tabular-nums', verticalAlign: 'middle' }}>
+                    {c.value > 0 ? fmt(c.value) : <span style={{ color: 'var(--fg-4)' }}>—</span>}
+                  </td>
+                  <td style={{ padding: '14px 16px', borderBottom: '1px solid var(--border-soft)', verticalAlign: 'middle' }}>
+                    <StatusChip status={c.status} />
+                  </td>
+                  <td style={{ padding: '14px 12px', borderBottom: '1px solid var(--border-soft)', verticalAlign: 'middle', color: 'var(--fg-4)' }}>
+                    <ChevronRight size={15} />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* RIGHT column */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+
+          {/* Entregas urgentes */}
+          <div style={{ background: 'var(--surface-1)', border: '1px solid var(--border)', borderRadius: 'var(--r-lg)', padding: 20 }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+              <span className="os-title" style={{ fontSize: 14, color: 'var(--fg-1)' }}>Entregas urgentes</span>
+              <Link href="/tarefas" style={{ fontSize: 11.5, color: 'var(--fg-3)', display: 'inline-flex', alignItems: 'center', gap: 3 }}
+                onMouseEnter={e => (e.currentTarget as HTMLAnchorElement).style.color = 'var(--accent)'}
+                onMouseLeave={e => (e.currentTarget as HTMLAnchorElement).style.color = 'var(--fg-3)'}
+              >
+                Ver tudo <ArrowRight size={12} />
               </Link>
             </div>
-
-            {/* Clients */}
-            <Card>
-              <CardBody className="pt-5">
-                <ClientsWidget />
-              </CardBody>
-            </Card>
-
-            {/* Sugestões por energia */}
-            <div className="rounded-[15px] border p-4 space-y-2.5" style={{ background: `color-mix(in srgb, ${energy.accent} 7%, white)`, borderColor: `color-mix(in srgb, ${energy.accent} 20%, white)` }}>
-              <div className="flex items-center gap-2">
-                <span className="text-base">{energy.emoji}</span>
-                <p className="text-[10.5px] font-bold uppercase tracking-wider" style={{ color: energy.accent }}>Para o modo {energy.label}</p>
-              </div>
-              {energy.suggestedActions.slice(0, 4).map((a) => (
-                <div key={a} className="flex items-center gap-2">
-                  <div className="w-1 h-1 rounded-full flex-shrink-0" style={{ backgroundColor: energy.accent }} />
-                  <p className="text-[12.5px] text-[var(--text-secondary)]">{a}</p>
-                </div>
-              ))}
-            </div>
-
-            {/* Recent ideas */}
-            <Card>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <h2 className="text-sm font-semibold text-[var(--text-primary)]">Ideias recentes</h2>
-                  <Link href="/ideias" className="text-[10px] text-[var(--text-accent)] hover:underline flex items-center gap-1">
-                    Ver todas <ArrowRight size={10} />
-                  </Link>
-                </div>
-              </CardHeader>
-              <CardBody className="pt-0 space-y-2">
-                {(recentIdeas.length > 0 ? recentIdeas : DEMO_IDEAS).map((idea) => (
-                  <Link
-                    key={idea.id}
-                    href="/ideias"
-                    className="flex items-start gap-2 p-2.5 rounded-xl bg-[var(--bg-elevated)] border border-[var(--border)] hover:border-amber-200 transition-all group"
-                  >
-                    <Lightbulb size={13} className="text-amber-400 flex-shrink-0 mt-0.5" />
-                    <p className="text-xs text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors leading-snug">
-                      {idea.titulo}
-                    </p>
-                  </Link>
-                ))}
-                <Button variant="ghost" size="sm" className="w-full mt-1" onClick={() => setCaptureOpen(true)}>
-                  <Plus size={13} /> Capturar ideia
-                </Button>
-              </CardBody>
-            </Card>
-
-            {/* Semana em números */}
-            <Card>
-              <CardBody className="pt-5">
-                <WeekProgress />
-              </CardBody>
-            </Card>
-
-            {/* Fixed reminders */}
-            <Card>
-              <CardHeader>
-                <div className="flex items-center gap-2">
-                  <Bell size={14} className="text-[var(--text-muted)]" />
-                  <h2 className="text-sm font-semibold text-[var(--text-primary)]">Lembretes fixos</h2>
-                </div>
-              </CardHeader>
-              <CardBody className="pt-0 space-y-2">
-                {RECURRENCES.map((r) => (
-                  <div key={r.texto} className="flex items-center justify-between p-2.5 rounded-xl bg-[var(--bg-elevated)] border border-[var(--border)]">
-                    <span className="text-xs text-[var(--text-primary)]">{r.texto}</span>
-                    <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ backgroundColor: `${r.cor}20`, color: r.cor }}>
-                      {r.hora}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              {urgentDeliveries.map(d => {
+                const clientData = clientById(d.client)
+                const owner     = userById(d.owner)
+                return (
+                  <div key={d.id} style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+                    <span style={{ width: 7, height: 7, borderRadius: '50%', background: dueDotColor(d), flexShrink: 0, marginTop: 5 }} />
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: 13, color: 'var(--fg-1)', fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        {d.task}
+                      </div>
+                      <div style={{ fontSize: 11.5, color: 'var(--fg-3)', marginTop: 2 }}>
+                        {clientData?.name ?? d.client} · {owner?.name ?? d.owner}
+                      </div>
+                    </div>
+                    <span style={{ fontSize: 11.5, fontWeight: 500, color: dueLabelColor(d), flexShrink: 0, whiteSpace: 'nowrap' }}>
+                      {dueLabel(d)}
                     </span>
                   </div>
-                ))}
-              </CardBody>
-            </Card>
-          </motion.div>
+                )
+              })}
+              {urgentDeliveries.length === 0 && (
+                <span style={{ fontSize: 13, color: 'var(--fg-3)' }}>Nenhuma entrega urgente.</span>
+              )}
+            </div>
+          </div>
+
+          {/* Vencimentos de contrato */}
+          <div style={{ background: 'var(--surface-1)', border: '1px solid var(--border)', borderRadius: 'var(--r-lg)', padding: 20 }}>
+            <div style={{ marginBottom: 16 }}>
+              <span className="os-title" style={{ fontSize: 14, color: 'var(--fg-1)' }}>Vencimentos de contrato</span>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              {renewalClients.map(c => {
+                const days = daysUntil(c.renew)
+                const dotColor = renewDotColor(days)
+                const renewDate = new Date(c.renew + 'T00:00:00')
+                const dateLabel = renewDate.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' })
+                return (
+                  <div key={c.id} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <span style={{ width: 7, height: 7, borderRadius: '50%', background: dotColor, flexShrink: 0 }} />
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--fg-1)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        {c.name}
+                      </div>
+                      <div style={{ fontSize: 11.5, color: 'var(--fg-3)', marginTop: 2 }}>
+                        Renova em {dateLabel}
+                      </div>
+                    </div>
+                    <span style={{
+                      fontSize: 11.5, fontWeight: 500, flexShrink: 0, whiteSpace: 'nowrap',
+                      color: days < 0 ? 'var(--red)' : days <= 7 ? 'var(--yellow)' : 'var(--fg-3)',
+                    }}>
+                      {days < 0 ? `${Math.abs(days)}d atraso` : days === 0 ? 'hoje' : `${days}d`}
+                    </span>
+                  </div>
+                )
+              })}
+              {renewalClients.length === 0 && (
+                <span style={{ fontSize: 13, color: 'var(--fg-3)' }}>Nenhum vencimento próximo.</span>
+              )}
+            </div>
+          </div>
+
         </div>
-      </motion.div>
+      </div>
     </div>
   )
 }
