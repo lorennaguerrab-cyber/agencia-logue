@@ -1,212 +1,142 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useLorennStore } from '@/lib/store'
-import { ENERGY_CONFIGS } from '@/lib/energy'
-import { cn } from '@/lib/utils'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useOsStore } from '@/lib/os-store'
 import {
-  LayoutDashboard, Zap, Archive, CheckSquare, FileText,
-  BookMarked, Users, Sparkles, CalendarDays, DollarSign,
-  Settings, ChevronLeft, ChevronRight, User, BarChart2, Menu, X,
+  LayoutDashboard, Users, KanbanSquare, Sparkles, Film,
+  Calculator, FileText, Wallet, Target, Network, Building2,
+  ChevronDown,
 } from 'lucide-react'
-import type { EnergyMode } from '@/lib/types'
 
-const navItems = [
-  { href: '/',               icon: LayoutDashboard, label: 'Dashboard'          },
-  { href: '/captura',        icon: Zap,             label: 'Baú de Ideias'      },
-  { href: '/ideias',         icon: Archive,         label: 'Acervo de Conteúdo' },
-  { href: '/tarefas',        icon: CheckSquare,     label: 'Tarefas'            },
-  { href: '/conteudo',       icon: FileText,        label: 'Conteúdo'           },
-  { href: '/prompts',        icon: BookMarked,      label: 'Prompts'            },
-  { href: '/clientes',       icon: Users,           label: 'Clientes'           },
-  { href: '/crm',            icon: Sparkles,        label: 'CRM Criativo'       },
-  { href: '/calendario',     icon: CalendarDays,    label: 'Agenda'             },
-  { href: '/monetizacao',    icon: DollarSign,      label: 'Monetização'        },
-  { href: '/financeiro',     icon: BarChart2,       label: 'Financeiro'         },
-  { href: '/sobre',          icon: User,            label: 'Sobre'              },
-  { href: '/como-por-no-ar', icon: Settings,        label: 'Como pôr no ar'     },
+const NAV = [
+  {
+    group: 'Principal',
+    items: [
+      { id: 'dashboard', href: '/',          icon: LayoutDashboard, name: 'Dashboard' },
+      { id: 'clientes',  href: '/clientes',  icon: Users,           name: 'Clientes' },
+      { id: 'entregas',  href: '/entregas',  icon: KanbanSquare,    name: 'Entregas' },
+    ],
+  },
+  {
+    group: 'Criar',
+    items: [
+      { id: 'ia',            href: '/ia',            icon: Sparkles,    name: 'IA de Conteúdo' },
+      { id: 'roteiros',      href: '/roteiros',      icon: Film,        name: 'Roteiros' },
+      { id: 'precificacao',  href: '/precificacao',  icon: Calculator,  name: 'Precificação' },
+      { id: 'contratos',     href: '/contratos',     icon: FileText,    name: 'Contratos' },
+    ],
+  },
+  {
+    group: 'Negócio',
+    items: [
+      { id: 'financeiro', href: '/financeiro', icon: Wallet,    name: 'Financeiro' },
+      { id: 'radar',      href: '/radar',      icon: Target,    name: 'Ticket Radar' },
+      { id: 'rede',       href: '/rede',       icon: Network,   name: 'Rede Estratégica' },
+      { id: 'agencia',    href: '/agencia',    icon: Building2, name: 'Agência' },
+    ],
+  },
 ]
 
-const ENERGY_ORDER: EnergyMode[] = ['cansada', 'criativa', 'operacional', 'foco', 'social', 'maternidade', 'gravacao']
+const COLLAB_ALLOWED = ['/entregas', '/roteiros']
 
-function SidebarContent({
-  collapsed,
-  onCollapse,
-  onClose,
-  isMobileDrawer = false,
-}: {
-  collapsed: boolean
-  onCollapse: () => void
-  onClose?: () => void
-  isMobileDrawer?: boolean
-}) {
-  const { energyMode, setEnergyMode } = useLorennStore()
+export function Sidebar() {
   const pathname = usePathname()
-  const energy = ENERGY_CONFIGS[energyMode]
+  const { user, logOut } = useOsStore()
+  if (!user) return null
+
+  const isCollab = user.access === 'collab'
 
   return (
-    <div className="flex flex-col h-full">
+    <aside style={{
+      background: 'var(--surface-1)',
+      borderRight: '1px solid var(--border)',
+      display: 'flex',
+      flexDirection: 'column',
+      padding: '20px 14px',
+      overflowY: 'auto',
+      height: '100vh',
+    }}>
       {/* Brand */}
-      <div className={cn(
-        'flex items-center h-[68px] px-5 border-b border-[var(--border)] flex-shrink-0',
-        collapsed && !isMobileDrawer ? 'justify-center px-0' : 'gap-3'
-      )}>
-        <div className="w-[42px] h-[42px] rounded-[15px] flex items-center justify-center flex-shrink-0" style={{ background: 'var(--pink)' }}>
-          <span className="text-white text-lg font-bold" style={{ fontFamily: 'var(--font-syne)' }}>L</span>
-        </div>
-        {(!collapsed || isMobileDrawer) && (
-          <div className="flex-1 min-w-0">
-            <p className="font-bold text-[17px] leading-tight text-[var(--text-primary)] truncate" style={{ fontFamily: 'var(--font-syne)', letterSpacing: '-0.02em' }}>Lorenna OS</p>
-            <p className="text-[11px] text-[var(--text-muted)] mt-0.5">Agência Logue · Papel da Lola</p>
-          </div>
-        )}
-        {isMobileDrawer && (
-          <button onClick={onClose} className="ml-auto p-1.5 rounded-[10px] hover:bg-[var(--offwhite)] text-[var(--text-muted)]">
-            <X size={16} />
-          </button>
-        )}
-      </div>
-
-      {/* Energy chip */}
-      <div
-        className={cn('mx-3 mt-3 rounded-[15px] px-3 py-2.5 border flex-shrink-0', collapsed && !isMobileDrawer ? 'flex justify-center px-0' : '')}
-        style={{ backgroundColor: `${energy.accent}12`, borderColor: `${energy.accent}30` }}
-      >
-        {collapsed && !isMobileDrawer ? (
-          <span className="text-xl">{energy.emoji}</span>
-        ) : (
-          <div>
-            <p className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider font-medium mb-0.5">Modo atual</p>
-            <p className="text-sm font-semibold" style={{ color: energy.accent, fontFamily: 'var(--font-syne)' }}>
-              {energy.emoji} {energy.label}
-            </p>
-          </div>
-        )}
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: 1, padding: '8px 10px 24px' }}>
+        <span className="os-title" style={{ fontSize: 22, letterSpacing: '-0.04em', color: 'var(--fg-1)' }}>logue</span>
+        <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--accent)', alignSelf: 'flex-end', marginBottom: 5 }} />
+        <span className="os-title" style={{ fontSize: 12, letterSpacing: '0.1em', color: 'var(--accent)', marginLeft: 8 }}>OS</span>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-2 py-3 space-y-0.5 overflow-y-auto">
-        {navItems.map((item) => {
-          const active = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href))
+      <nav style={{ flex: 1 }}>
+        {NAV.map(group => {
+          const items = group.items.filter(item => !isCollab || COLLAB_ALLOWED.includes(item.href))
+          if (items.length === 0) return null
           return (
-            <Link
-              key={item.href}
-              href={item.href}
-              onClick={onClose}
-              className={cn(
-                'flex items-center gap-3 rounded-[15px] px-3 py-[11px] text-[13.5px] font-medium transition-all duration-150',
-                collapsed && !isMobileDrawer ? 'justify-center' : '',
-                active
-                  ? 'border border-transparent'
-                  : 'text-[var(--text-secondary)] hover:bg-[var(--offwhite)] hover:text-[var(--text-primary)] border border-transparent'
-              )}
-              style={active ? { background: 'var(--pink-tint)', color: 'var(--pink-deep)' } : undefined}
-              title={collapsed && !isMobileDrawer ? item.label : undefined}
-            >
-              <item.icon size={17} className="flex-shrink-0" style={active ? { color: 'var(--pink-deep)' } : { color: 'var(--gray)' }} />
-              {(!collapsed || isMobileDrawer) && <span>{item.label}</span>}
-            </Link>
+            <div key={group.group} style={{ marginBottom: 18 }}>
+              <div style={{
+                fontSize: 10, fontWeight: 600, letterSpacing: '0.16em', textTransform: 'uppercase',
+                color: 'var(--fg-4)', padding: '0 10px 8px',
+              }}>
+                {group.group}
+              </div>
+              {items.map(item => {
+                const active = item.href === '/'
+                  ? pathname === '/'
+                  : pathname.startsWith(item.href)
+                const Icon = item.icon
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: 11,
+                      padding: '9px 10px', borderRadius: 'var(--r-sm)',
+                      color: active ? 'var(--accent)' : 'var(--fg-2)',
+                      fontSize: 13, fontWeight: active ? 500 : 400,
+                      background: active ? 'var(--accent-ghost)' : 'transparent',
+                      transition: 'background var(--dur), color var(--dur)',
+                      marginBottom: 2,
+                      textDecoration: 'none',
+                    }}
+                  >
+                    <Icon size={18} color={active ? 'var(--accent)' : 'var(--fg-3)'} style={{ flexShrink: 0 }} />
+                    <span>{item.name}</span>
+                  </Link>
+                )
+              })}
+            </div>
           )
         })}
       </nav>
 
-      {/* Energy quick-switch */}
-      {(!collapsed || isMobileDrawer) && (
-        <div className="px-4 pb-3 flex-shrink-0">
-          <p className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider font-medium mb-2">Trocar energia</p>
-          <div className="grid grid-cols-4 gap-1">
-            {ENERGY_ORDER.map((id) => {
-              const e = ENERGY_CONFIGS[id]
-              return (
-                <button
-                  key={id}
-                  onClick={() => setEnergyMode(id)}
-                  title={e.label}
-                  className={cn('h-9 rounded-[12px] text-base border transition-all', energyMode === id ? 'border-[var(--pink-soft)]' : 'bg-[var(--offwhite)] border-transparent hover:bg-[var(--gray-light)]')}
-                  style={energyMode === id ? { background: 'var(--pink-tint)', borderColor: 'var(--pink-soft)' } : undefined}
-                >
-                  {e.emoji}
-                </button>
-              )
-            })}
-          </div>
-        </div>
-      )}
-
-      {/* Collapse toggle — desktop only */}
-      {!isMobileDrawer && (
-        <div className={cn('p-3 border-t border-[var(--border)] flex flex-shrink-0', collapsed ? 'justify-center' : 'justify-end')}>
-          <button onClick={onCollapse} className="text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors p-1.5 rounded-[10px] hover:bg-[var(--offwhite)]">
-            {collapsed ? <ChevronRight size={15} /> : <ChevronLeft size={15} />}
-          </button>
-        </div>
-      )}
-    </div>
-  )
-}
-
-export function Sidebar() {
-  const { sidebarCollapsed, setSidebarCollapsed } = useLorennStore()
-  const [mobileOpen, setMobileOpen] = useState(false)
-  const pathname = usePathname()
-
-  // close drawer on navigation
-  useEffect(() => { setMobileOpen(false) }, [pathname])
-
-  // prevent body scroll when drawer open
-  useEffect(() => {
-    if (mobileOpen) document.body.style.overflow = 'hidden'
-    else document.body.style.overflow = ''
-    return () => { document.body.style.overflow = '' }
-  }, [mobileOpen])
-
-  return (
-    <>
-      {/* Desktop sidebar */}
-      <aside
-        className={cn(
-          'fixed left-0 top-0 h-screen z-40 bg-white border-r border-[var(--border)] transition-all duration-300 ease-in-out',
-          'hidden md:flex flex-col',
-          sidebarCollapsed ? 'w-[70px]' : 'w-[220px]',
-        )}
-      >
-        <SidebarContent collapsed={sidebarCollapsed} onCollapse={() => setSidebarCollapsed(!sidebarCollapsed)} />
-      </aside>
-
-      {/* Mobile hamburger button */}
-      <button
-        onClick={() => setMobileOpen(true)}
-        className="fixed top-4 left-4 z-40 md:hidden w-10 h-10 flex items-center justify-center rounded-[12px] bg-white border border-[var(--border)] shadow-sm text-[var(--text-primary)]"
-      >
-        <Menu size={18} />
-      </button>
-
-      {/* Mobile drawer overlay */}
-      {mobileOpen && (
-        <div
-          className="fixed inset-0 z-50 md:hidden"
-          onClick={() => setMobileOpen(false)}
-          style={{ background: 'rgba(43,43,43,0.4)', backdropFilter: 'blur(2px)' }}
-        />
-      )}
-
-      {/* Mobile drawer */}
-      <aside
-        className={cn(
-          'fixed left-0 top-0 h-screen z-50 bg-white border-r border-[var(--border)] flex flex-col md:hidden',
-          'w-[280px] transition-transform duration-300 ease-in-out',
-          mobileOpen ? 'translate-x-0' : '-translate-x-full'
-        )}
-      >
-        <SidebarContent
-          collapsed={false}
-          onCollapse={() => {}}
-          onClose={() => setMobileOpen(false)}
-          isMobileDrawer
-        />
-      </aside>
-    </>
+      {/* User chip */}
+      <div style={{ marginTop: 'auto', paddingTop: 16 }}>
+        <button
+          onClick={logOut}
+          style={{
+            display: 'flex', alignItems: 'center', gap: 10, width: '100%',
+            background: 'var(--surface-2)', border: '1px solid var(--border)',
+            borderRadius: 'var(--r-md)', padding: '8px 10px',
+            transition: 'border-color var(--dur), background var(--dur)',
+            cursor: 'pointer',
+          }}
+          title="Clique para sair"
+        >
+          <span style={{
+            width: 32, height: 32, borderRadius: 8, flexShrink: 0,
+            background: 'var(--accent)', color: '#0a0a0a',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 12,
+          }}>
+            {user.initials}
+          </span>
+          <span style={{ display: 'flex', flexDirection: 'column', textAlign: 'left', flex: 1, minWidth: 0 }}>
+            <span style={{ fontSize: 12.5, fontWeight: 500, color: 'var(--fg-1)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              {user.name}
+            </span>
+            <span style={{ fontSize: 11, color: 'var(--fg-3)' }}>{user.role}</span>
+          </span>
+          <ChevronDown size={16} color="var(--fg-3)" />
+        </button>
+      </div>
+    </aside>
   )
 }
