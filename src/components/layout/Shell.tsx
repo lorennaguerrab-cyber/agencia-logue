@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
-import { usePathname, useRouter } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { useOsStore } from '@/lib/os-store'
 import { TopbarProvider, useTopbar } from '@/lib/topbar-context'
 import { Sidebar } from './Sidebar'
@@ -72,17 +72,15 @@ function Topbar() {
 }
 
 function AppShell({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname()
   const router = useRouter()
   const { user } = useOsStore()
 
   useEffect(() => {
-    if (!user && pathname !== '/login') {
+    if (!user) {
       router.replace('/login')
     }
-  }, [user, pathname, router])
+  }, [user, router])
 
-  if (pathname === '/login') return <>{children}</>
   if (!user) return null
 
   return (

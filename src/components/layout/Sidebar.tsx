@@ -6,39 +6,40 @@ import { useOsStore } from '@/lib/os-store'
 import {
   LayoutDashboard, Users, KanbanSquare, Sparkles, Film,
   Calculator, FileText, Wallet, Target, Network, Building2,
-  ChevronDown,
+  BookOpen, ChevronDown,
 } from 'lucide-react'
 
 const NAV = [
   {
     group: 'Principal',
     items: [
-      { id: 'dashboard', href: '/',          icon: LayoutDashboard, name: 'Dashboard' },
-      { id: 'clientes',  href: '/clientes',  icon: Users,           name: 'Clientes' },
-      { id: 'entregas',  href: '/entregas',  icon: KanbanSquare,    name: 'Entregas' },
+      { id: 'dashboard', href: '/painel',           icon: LayoutDashboard, name: 'Dashboard' },
+      { id: 'clientes',  href: '/painel/clientes',  icon: Users,           name: 'Clientes' },
+      { id: 'entregas',  href: '/painel/entregas',  icon: KanbanSquare,    name: 'Entregas' },
     ],
   },
   {
-    group: 'Criar',
+    group: 'IA & Conteúdo',
     items: [
-      { id: 'ia',            href: '/ia',            icon: Sparkles,    name: 'IA de Conteúdo' },
-      { id: 'roteiros',      href: '/roteiros',      icon: Film,        name: 'Roteiros' },
-      { id: 'precificacao',  href: '/precificacao',  icon: Calculator,  name: 'Precificação' },
-      { id: 'contratos',     href: '/contratos',     icon: FileText,    name: 'Contratos' },
+      { id: 'ia',            href: '/painel/ia',            icon: Sparkles,    name: 'Ferramentas de IA' },
+      { id: 'roteiros',      href: '/painel/roteiros',      icon: Film,        name: 'Roteiros' },
+      { id: 'base',          href: '/painel/base',          icon: BookOpen,    name: 'Base de conhecimento' },
+      { id: 'precificacao',  href: '/painel/precificacao',  icon: Calculator,  name: 'Precificação' },
+      { id: 'contratos',     href: '/painel/contratos',     icon: FileText,    name: 'Contratos' },
     ],
   },
   {
     group: 'Negócio',
     items: [
-      { id: 'financeiro', href: '/financeiro', icon: Wallet,    name: 'Financeiro' },
-      { id: 'radar',      href: '/radar',      icon: Target,    name: 'Ticket Radar' },
-      { id: 'rede',       href: '/rede',       icon: Network,   name: 'Rede Estratégica' },
-      { id: 'agencia',    href: '/agencia',    icon: Building2, name: 'Agência' },
+      { id: 'financeiro', href: '/painel/financeiro', icon: Wallet,    name: 'Financeiro' },
+      { id: 'radar',      href: '/painel/radar',      icon: Target,    name: 'Ticket Radar' },
+      { id: 'rede',       href: '/painel/rede',       icon: Network,   name: 'Rede Estratégica' },
+      { id: 'agencia',    href: '/painel/agencia',    icon: Building2, name: 'Agência' },
     ],
   },
 ]
 
-const COLLAB_ALLOWED = ['/entregas', '/roteiros']
+const COLLAB_ALLOWED = ['/painel/entregas', '/painel/roteiros']
 
 export function Sidebar() {
   const pathname = usePathname()
@@ -78,8 +79,8 @@ export function Sidebar() {
                 {group.group}
               </div>
               {items.map(item => {
-                const active = item.href === '/'
-                  ? pathname === '/'
+                const active = item.href === '/painel'
+                  ? pathname === '/painel'
                   : pathname.startsWith(item.href)
                 const Icon = item.icon
                 return (

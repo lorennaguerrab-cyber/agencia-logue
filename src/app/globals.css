@@ -100,3 +100,67 @@ input, textarea, select { font-family: inherit; color: var(--fg-1); }
   to   { opacity: 1; transform: none; }
 }
 .os-view-in { animation: os-view-in 320ms var(--ease); }
+
+/* ============================================================
+   Site institucional — utilidades e responsividade
+   ============================================================ */
+.site-section { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+.site-eyebrow {
+  font-family: var(--font-body); font-weight: 600; font-size: 12px;
+  letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent);
+}
+.site-h1 { font-family: var(--font-display); font-weight: 800; letter-spacing: -0.03em; line-height: 1.04; font-size: clamp(40px, 6vw, 76px); }
+.site-h2 { font-family: var(--font-display); font-weight: 700; letter-spacing: -0.02em; line-height: 1.1; font-size: clamp(28px, 4vw, 44px); }
+.site-lead { font-size: clamp(16px, 2vw, 19px); color: var(--fg-2); line-height: 1.65; }
+
+.btn-accent {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 13px 24px; border-radius: var(--r-pill);
+  background: var(--accent); color: #0a0a0a; font-weight: 600; font-size: 14.5px;
+  border: 1px solid transparent; transition: transform var(--dur), box-shadow var(--dur);
+}
+.btn-accent:hover { transform: translateY(-1px); box-shadow: 0 10px 30px var(--accent-ghost-2); }
+.btn-ghost {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 13px 24px; border-radius: var(--r-pill);
+  background: transparent; color: var(--fg-1); font-weight: 500; font-size: 14.5px;
+  border: 1px solid var(--border-strong); transition: border-color var(--dur), background var(--dur);
+}
+.btn-ghost:hover { border-color: var(--fg-3); background: var(--surface-1); }
+
+.card-soft {
+  background: var(--surface-1); border: 1px solid var(--border);
+  border-radius: var(--r-lg); padding: 28px; transition: border-color var(--dur), transform var(--dur);
+}
+.card-soft:hover { border-color: var(--border-strong); transform: translateY(-2px); }
+
+.site-nav-toggle { cursor: pointer; }
+
+@media (max-width: 880px) {
+  .site-nav-desktop { display: none !important; }
+  .site-nav-toggle { display: inline-flex !important; }
+  .site-footer-grid { grid-template-columns: 1fr !important; }
+}
+@media (min-width: 881px) {
+  .site-nav-mobile { display: none !important; }
+}
+
+/* Login responsivo */
+@media (max-width: 760px) {
+  .login-grid { grid-template-columns: 1fr !important; }
+  .login-aside { display: none !important; }
+}
+
+/* Área do cliente responsiva */
+@media (max-width: 760px) {
+  .client-grid { grid-template-columns: 1fr !important; }
+  .client-aside { position: static !important; height: auto !important; flex-direction: column; }
+}
+
+/* Chips de status reutilizáveis */
+.status-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 11px; border-radius: var(--r-pill);
+  font-size: 11.5px; font-weight: 500; border: 1px solid var(--border);
+  color: var(--fg-2); background: var(--surface-2);
+}
