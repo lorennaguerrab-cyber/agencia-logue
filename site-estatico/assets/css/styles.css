@@ -304,3 +304,7 @@ img { max-width: 100%; display: block; }
   .svc { grid-template-columns: 1fr; gap: 8px; }
   .hero .wrap { padding-top: 40px; }
 }
+
+/* Logo em imagem (JPEG sem transparência) — blend para sumir o fundo escuro */
+.brand-img { height: 40px; width: auto; display: block; }
+.site-footer .brand-img { height: 34px; }
