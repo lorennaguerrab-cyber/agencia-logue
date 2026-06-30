@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useOsStore } from '@/lib/os-store'
 import { TopbarProvider, useTopbar } from '@/lib/topbar-context'
@@ -74,14 +74,20 @@ function Topbar() {
 function AppShell({ children }: { children: React.ReactNode }) {
   const router = useRouter()
   const { user } = useOsStore()
+  const [hydrated, setHydrated] = useState(false)
 
   useEffect(() => {
-    if (!user) {
+    setHydrated(useOsStore.persist.hasHydrated())
+    return useOsStore.persist.onFinishHydration(() => setHydrated(true))
+  }, [])
+
+  useEffect(() => {
+    if (hydrated && !user) {
       router.replace('/login')
     }
-  }, [user, router])
+  }, [hydrated, user, router])
 
-  if (!user) return null
+  if (!hydrated || !user) return null
 
   return (
     <div style={{

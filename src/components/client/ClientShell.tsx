@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useClientStore } from '@/lib/client/store'
@@ -23,12 +23,18 @@ export function ClientShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const router = useRouter()
   const { account, logOut } = useClientStore()
+  const [hydrated, setHydrated] = useState(false)
 
   useEffect(() => {
-    if (!account) router.replace('/login')
-  }, [account, router])
+    setHydrated(useClientStore.persist.hasHydrated())
+    return useClientStore.persist.onFinishHydration(() => setHydrated(true))
+  }, [])
 
-  if (!account) return null
+  useEffect(() => {
+    if (hydrated && !account) router.replace('/login')
+  }, [hydrated, account, router])
+
+  if (!hydrated || !account) return null
 
   return (
     <div style={{ display: 'grid', gridTemplateColumns: '252px 1fr', minHeight: '100vh' }} className="client-grid">
