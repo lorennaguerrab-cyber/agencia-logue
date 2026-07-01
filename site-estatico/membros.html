@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Área de Membros · Logue</title>
+  <meta name="description" content="Área de membros da Logue: cursos, ferramentas com IA, briefings, onboarding, pedidos, campanhas e entrega de posts." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/styles.css" />
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="wrap">
+      <a href="index.html" class="brand" aria-label="Logue"><img class="brand-img" src="assets/img/logo-logue.png" alt="Logue" /></a>
+      <nav class="nav">
+        <a class="link" href="index.html">Início</a>
+        <a class="link" href="sobre.html">Sobre</a>
+        <a class="link" href="servicos.html">Serviços</a>
+        <a class="link" href="blog.html">Blog</a>
+        <a class="link active" href="membros.html">Membros</a>
+        <a class="link" href="freebies.html">Freebies</a>
+        <a class="link" href="loja.html">Loja</a>
+        <a class="btn btn-pink" href="#entrar">Entrar 👋</a>
+      </nav>
+      <button class="burger" aria-label="Menu" onclick="document.getElementById('mnav').classList.toggle('open')" style="font-size:24px;">☰</button>
+    </div>
+    <div class="mobile-nav" id="mnav"><div class="wrap">
+      <a href="index.html">🏠 Início</a><a href="sobre.html">💁‍♀️ Sobre</a><a href="servicos.html">✨ Serviços</a><a href="blog.html">📝 Blog</a><a href="membros.html">🔓 Membros</a><a href="freebies.html">🎁 Freebies</a><a href="loja.html">🛍️ Loja</a>
+      <a class="btn btn-pink" href="#entrar">Entrar 👋</a>
+    </div></div>
+  </header>
+
+  <!-- HERO + LOGIN (dark) -->
+  <section class="band dark" id="entrar">
+    <div class="wrap">
+      <div style="display:grid; grid-template-columns:1.1fr .9fr; gap:clamp(24px,4vw,48px); align-items:center;" class="founder">
+        <div>
+          <span class="eyebrow reveal">Área de membros 🔓</span>
+          <h1 class="display reveal" style="margin:18px 0 16px; font-size:clamp(36px,5vw,60px); max-width:14ch;">Sua marca, <span class="pink">organizada.</span></h1>
+          <p class="lead reveal" style="max-width:520px;">Clientes e alunos acessam aqui: cursos, ferramentas de IA, briefings, pedidos, campanhas e a entrega dos posts. Tudo em um lugar só.</p>
+          <ul class="elist reveal" style="margin-top:22px;">
+            <li><span class="e">⚡</span><span>Ferramentas que geram ideias, legendas e roteiros.</span></li>
+            <li><span class="e">✅</span><span>Aprove conteúdos e baixe os arquivos finais.</span></li>
+            <li><span class="e">📊</span><span>Acompanhe o status de cada demanda.</span></li>
+          </ul>
+        </div>
+        <div class="card reveal" style="padding:28px;">
+          <h2 class="h3" style="margin-bottom:4px;">Entrar 👋</h2>
+          <p class="muted" style="font-size:13.5px; margin-bottom:18px;">Acesse com seu e-mail e senha.</p>
+          <form onsubmit="alert('Em breve! 💛 A área de membros entra no ar logo.'); return false;" style="display:flex; flex-direction:column; gap:14px;">
+            <div><label class="label">E-mail</label><input class="field" type="email" placeholder="voce@email.com" required /></div>
+            <div><label class="label">Senha</label><input class="field" type="password" placeholder="••••••••" required /></div>
+            <button type="submit" class="btn btn-pink" style="justify-content:center;">Acessar minha área →</button>
+            <p style="font-size:12.5px; color:var(--ink-3); text-align:center;">Ainda não tem acesso? <a href="https://wa.me/55" class="pink">Fale com a Logue 💬</a></p>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- O QUE TEM DENTRO (light) -->
+  <section class="band light">
+    <div class="wrap">
+      <span class="eyebrow reveal">O que tem dentro</span>
+      <h2 class="h2 reveal" style="margin:16px 0 40px;">Tudo o que você precisa pra criar e acompanhar.</h2>
+      <div class="emoji-grid">
+        <div class="ecard reveal"><span class="emo">🎓</span><h3>Cursos</h3><p>Suas aulas, módulos e materiais de apoio sempre disponíveis.</p></div>
+        <div class="ecard reveal"><span class="emo">🧰</span><h3>Ferramentas de IA</h3><p>Gerador de ideias, de legendas e transformador de demanda em briefing.</p></div>
+        <div class="ecard reveal"><span class="emo">📋</span><h3>Formulários de briefing</h3><p>Responda de forma guiada pra equipe entender exatamente o que você quer.</p></div>
+        <div class="ecard reveal"><span class="emo">🚀</span><h3>Onboarding</h3><p>O passo a passo pra começar com a Logue do jeito certo.</p></div>
+        <div class="ecard reveal"><span class="emo">📨</span><h3>Pedidos &amp; demandas</h3><p>Envie demandas e ideias soltas — e acompanhe o status.</p></div>
+        <div class="ecard reveal"><span class="emo">🗓️</span><h3>Campanhas</h3><p>Planeje datas comerciais e lançamentos com a gente.</p></div>
+        <div class="ecard reveal"><span class="emo">📦</span><h3>Entrega de posts</h3><p>Veja, aprove ou peça ajustes e baixe os arquivos finais.</p></div>
+        <div class="ecard reveal"><span class="emo">📁</span><h3>Arquivos &amp; Drive</h3><p>Tudo do seu projeto, organizado e fácil de achar.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA (pink) -->
+  <section class="band pink">
+    <div class="wrap center">
+      <h2 class="h2 reveal" style="margin:0 auto 16px; max-width:20ch; color:#fff;">Quer fazer parte? 💛</h2>
+      <p class="lead reveal" style="max-width:520px; margin:0 auto 30px; color:#fff;">Seja cliente ou aluna, você tem acesso à área de membros da Logue.</p>
+      <a href="https://wa.me/55" target="_blank" rel="noreferrer" class="btn btn-light reveal">Falar com a Logue 💬</a>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <div class="foot-grid">
+        <div><a href="index.html" class="brand" style="margin-bottom:16px;"><img class="brand-img" src="assets/img/logo-logue.png" alt="Logue" /></a><p style="color:var(--ink-2); max-width:340px; font-size:14.5px;">Logue | Design &amp; Social Media. Itabira, desde 2019.</p></div>
+        <div><h4>Navegar</h4><a href="sobre.html">Sobre</a><a href="servicos.html">Serviços</a><a href="blog.html">Blog</a><a href="membros.html">Membros</a><a href="freebies.html">Freebies</a><a href="loja.html">Loja</a></div>
+        <div><h4>Contato</h4><a href="https://instagram.com/agencialogue" target="_blank" rel="noreferrer">📸 @agencialogue</a><a href="https://msha.ke/logue" target="_blank" rel="noreferrer">🔗 msha.ke/logue</a><a href="https://wa.me/55" target="_blank" rel="noreferrer">💬 WhatsApp</a></div>
+      </div>
+      <div class="foot-bottom"><span>© <span id="yr"></span> Logue · Itabira/MG.</span><span>Feito com 💛 e estratégia.</span></div>
+    </div>
+  </footer>
+
+  <script src="assets/js/main.js"></script>
+</body>
+</html>
