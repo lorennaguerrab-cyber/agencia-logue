@@ -1,8 +1,4 @@
-'use client'
-
-import { useEffect } from 'react'
 import { Raleway, Syne as SyneBrand, Questrial } from 'next/font/google'
-import { useTopbar } from '@/lib/topbar-context'
 
 const raleway = Raleway({ subsets: ['latin'], variable: '--font-raleway', weight: ['400', '600', '800', '900'] })
 const syneBrand = SyneBrand({ subsets: ['latin'], variable: '--font-syne-brand', weight: ['700', '800'] })
@@ -15,18 +11,19 @@ interface Swatch {
   border?: boolean
 }
 
-function SwatchGrid({ swatches }: { swatches: Swatch[] }) {
+function Swatches({ swatches }: { swatches: Swatch[] }) {
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 12 }}>
       {swatches.map((s) => (
         <div
           key={s.hex + s.label}
-          className="rounded-2xl h-[76px] flex items-end p-2.5"
-          style={{ background: s.hex, border: s.border ? '1px solid rgba(23,20,23,0.08)' : undefined }}
+          style={{
+            borderRadius: 14, height: 76, display: 'flex', alignItems: 'flex-end', padding: 10,
+            fontFamily: 'var(--font-syne-brand)', background: s.hex,
+            border: s.border ? '1px solid rgba(23,20,23,0.08)' : undefined,
+          }}
         >
-          <span className="font-[var(--font-syne-brand)] text-[11.5px]" style={{ color: s.text }}>
-            {s.hex} · {s.label}
-          </span>
+          <span style={{ fontSize: 11.5, color: s.text }}>{s.hex} · {s.label}</span>
         </div>
       ))}
     </div>
@@ -34,38 +31,16 @@ function SwatchGrid({ swatches }: { swatches: Swatch[] }) {
 }
 
 const BRAND_MAP = [
-  {
-    label: 'MARCA-MÃE', title: 'Lorenna Guerra',
-    desc: 'Todas as cores. Missão, visão e valores nascem aqui.',
-    bg: '#201e1f', labelColor: 'rgba(255,255,255,0.5)', titleColor: '#fff', descColor: 'rgba(255,255,255,0.6)',
-  },
-  {
-    label: 'FRENTE 1 · AUTORIDADE', title: 'Agência Logue',
-    desc: 'Rosa pink, branco, preto, rosa claro, lilás em degradê.',
-    bg: '#fe78b0', labelColor: 'rgba(32,30,31,0.55)', titleColor: '#201e1f', descColor: 'rgba(32,30,31,0.7)',
-  },
-  {
-    label: 'FRENTE 2 · INFOPRODUTO', title: 'Método do Prompt ao Post',
-    desc: 'Vermelho, rosa claro, branco de fundo, amarelos.',
-    bg: '#c32428', labelColor: 'rgba(255,255,255,0.6)', titleColor: '#fff', descColor: 'rgba(255,255,255,0.75)',
-  },
-  {
-    label: 'FRENTE 3 · AFILIADOS', title: 'Papel da Lola',
-    desc: 'Branco e as cores mais claras da paleta — sem marrom, vermelho ou preto.',
-    bg: '#a9d8f0', labelColor: 'rgba(32,30,31,0.55)', titleColor: '#201e1f', descColor: 'rgba(32,30,31,0.7)',
-  },
+  { label: 'MARCA-MÃE', title: 'Lorenna Guerra', desc: 'Todas as cores. Missão, visão e valores nascem aqui.', bg: '#201e1f', labelColor: 'rgba(255,255,255,0.5)', titleColor: '#fff', descColor: 'rgba(255,255,255,0.6)' },
+  { label: 'FRENTE 1 · AUTORIDADE', title: 'Agência Logue', desc: 'Rosa pink, branco, preto, rosa claro, lilás em degradê.', bg: '#fe78b0', labelColor: 'rgba(32,30,31,0.55)', titleColor: '#201e1f', descColor: 'rgba(32,30,31,0.7)' },
+  { label: 'FRENTE 2 · INFOPRODUTO', title: 'Método do Prompt ao Post', desc: 'Vermelho, rosa claro, branco de fundo, amarelos.', bg: '#c32428', labelColor: 'rgba(255,255,255,0.6)', titleColor: '#fff', descColor: 'rgba(255,255,255,0.75)' },
+  { label: 'FRENTE 3 · AFILIADOS', title: 'Papel da Lola', desc: 'Branco e as cores mais claras da paleta — sem marrom, vermelho ou preto.', bg: '#a9d8f0', labelColor: 'rgba(32,30,31,0.55)', titleColor: '#201e1f', descColor: 'rgba(32,30,31,0.7)' },
 ]
 
 const MISSION_CARDS = [
   { emoji: '🎨', title: 'Agência', desc: 'Lorenna como diretora criativa, mais colaboradores, Espaço Logue com estúdio e coworking.', bg: '#f7c2d8' },
   { emoji: '📈', title: 'Infoprodutos', desc: 'Principal fonte de renda — Método do Prompt ao Post e o que vier depois.', bg: '#fdf6d8' },
   { emoji: '🧭', title: 'Regra de ouro', desc: 'Se faz alguém se sentir mais criativo e capaz, é da marca. Se faz sentir inadequado, não é — em nenhuma frente.', bg: '#fdf3f6' },
-]
-
-const TYPE_SAMPLES = [
-  { name: 'Raleway', fontFamily: 'var(--font-raleway)', weight: 900, letterSpacing: '-0.02em', label: 'TÍTULOS — peso 900' },
-  { name: 'Syne', fontFamily: 'var(--font-syne-brand)', weight: 700, letterSpacing: '-0.01em', label: 'DESTAQUES, LABELS — peso 700/800' },
-  { name: 'Questrial', fontFamily: 'var(--font-questrial)', weight: 400, letterSpacing: 'normal', label: 'TEXTO CORRIDO — peso 400' },
 ]
 
 const PALETTE_LORENNA: Swatch[] = [
@@ -96,6 +71,9 @@ const PALETTE_METODO: Swatch[] = [
   { hex: '#f7c2d8', label: 'Rosa claro', text: '#201e1f' },
   { hex: '#ffffff', label: 'Branco (fundo)', text: '#201e1f', border: true },
   { hex: '#f4e04a', label: 'Amarelo', text: '#201e1f' },
+]
+
+const PALETTE_METODO_2: Swatch[] = [
   { hex: '#fdf6d8', label: 'Amarelo claro', text: '#201e1f', border: true },
   { hex: '#fdf3f6', label: 'Rosa claro fundo', text: '#201e1f', border: true },
 ]
@@ -105,168 +83,154 @@ const PALETTE_LOLA: Swatch[] = [
   { hex: '#f7c2d8', label: 'Rosa claro', text: '#201e1f' },
   { hex: '#fdf3f6', label: 'Rosa claro fundo', text: '#201e1f', border: true },
   { hex: '#a9d8f0', label: 'Azul claro', text: '#201e1f' },
+]
+
+const PALETTE_LOLA_2: Swatch[] = [
   { hex: '#cbb8e8', label: 'Lilás', text: '#201e1f' },
   { hex: '#fdf6d8', label: 'Amarelo claro', text: '#201e1f', border: true },
 ]
 
-function SectionHeading({ n, children }: { n: string; children: React.ReactNode }) {
-  return (
-    <div className="flex items-baseline gap-3.5 mb-5">
-      <div className="font-[var(--font-syne-brand)] font-extrabold text-[13px]" style={{ color: '#c94e83' }}>{n}</div>
-      <h2
-        className="font-[var(--font-raleway)] font-black tracking-[-0.02em] m-0"
-        style={{ fontSize: 'clamp(24px,2.8vw,32px)', color: '#201e1f' }}
-      >
-        {children}
-      </h2>
-    </div>
-  )
-}
-
-function PaletteSection({ emoji, title, desc, swatches, gradient }: { emoji: string; title: string; desc: string; swatches: Swatch[]; gradient?: { from: string; to: string; label: string } }) {
-  return (
-    <div className="pt-16">
-      <div className="flex items-center gap-3 mb-2">
-        <div className="w-9 h-9 rounded-full flex items-center justify-center text-[15px] flex-shrink-0" style={{ background: swatches[0].hex }}>{emoji}</div>
-        <h2 className="font-[var(--font-raleway)] font-black tracking-[-0.02em] m-0" style={{ fontSize: 'clamp(22px,2.4vw,28px)', color: '#201e1f' }}>{title}</h2>
-      </div>
-      <p className="text-sm leading-relaxed mb-6 max-w-xl" style={{ color: 'rgba(23,20,23,0.6)' }}>{desc}</p>
-      <SwatchGrid swatches={swatches} />
-      {gradient && (
-        <div
-          className="rounded-2xl h-[76px] flex items-end p-2.5 mt-3"
-          style={{ background: `linear-gradient(120deg, ${gradient.from}, ${gradient.to})` }}
-        >
-          <span className="font-[var(--font-syne-brand)] text-[11.5px]" style={{ color: '#201e1f' }}>{gradient.label}</span>
-        </div>
-      )}
-    </div>
-  )
-}
-
 export default function DesignSystemPage() {
-  const { setConfig } = useTopbar()
-  useEffect(() => {
-    setConfig({ title: 'Design System', subtitle: 'Identidade visual — marca-mãe' })
-  }, [setConfig])
-
   return (
-    <div className={`${raleway.variable} ${syneBrand.variable} ${questrial.variable} max-w-5xl mx-auto`}>
-      <div className="rounded-3xl overflow-hidden" style={{ fontFamily: 'var(--font-questrial)', color: '#201e1f', background: '#fff' }}>
+    <div
+      className={`${raleway.variable} ${syneBrand.variable} ${questrial.variable}`}
+      style={{ fontFamily: 'var(--font-questrial), sans-serif', color: '#201e1f', background: '#fff', paddingBottom: 100 }}
+    >
+      {/* TOPO */}
+      <div style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 6vw',
+        position: 'sticky', top: 0, zIndex: 50, background: 'rgba(255,255,255,0.9)', backdropFilter: 'blur(12px)',
+        borderBottom: '1px solid rgba(23,20,23,0.07)',
+      }}>
+        <div style={{ fontFamily: 'var(--font-syne-brand)', fontWeight: 700, fontSize: 14, letterSpacing: '0.04em' }}>Lorenna Guerra</div>
+        <div style={{ fontFamily: 'var(--font-questrial)', fontSize: 13, color: 'rgba(23,20,23,0.5)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Design System — marca-mãe</div>
+      </div>
 
-        {/* HERO */}
-        <div className="px-8 sm:px-14 pt-16 pb-14" style={{ background: '#fdf3f6' }}>
-          <div
-            className="font-[var(--font-questrial)] uppercase text-[13px] mb-4"
-            style={{ color: '#c94e83', letterSpacing: '0.12em' }}
-          >
-            ◆ sistema de design consolidado
-          </div>
-          <h1
-            className="font-[var(--font-raleway)] font-black m-0 mb-4 max-w-2xl"
-            style={{ fontSize: 'clamp(30px,4vw,50px)', lineHeight: 1.05, letterSpacing: '-0.02em' }}
-          >
-            Uma marca, duas frentes de monetização.
-          </h1>
-          <p className="text-[16.5px] leading-relaxed max-w-xl m-0" style={{ color: 'rgba(23,20,23,0.65)' }}>
-            Lorenna Guerra é a marca guarda-chuva. Missão, valores, voz e tipografia são os mesmos em qualquer frente
-            — só a paleta de cor muda para diferenciar Agência Logue de Método do Prompt ao Post.
+      {/* HERO */}
+      <div style={{ background: '#fdf3f6', padding: '80px 6vw 60px' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+          <div style={{ fontFamily: 'var(--font-questrial)', color: '#c94e83', textTransform: 'uppercase', letterSpacing: '0.12em', fontSize: 13, marginBottom: 16 }}>◆ sistema de design consolidado</div>
+          <h1 style={{ fontFamily: 'var(--font-raleway)', fontWeight: 900, fontSize: 'clamp(30px,4vw,50px)', lineHeight: 1.05, letterSpacing: '-0.02em', margin: '0 0 18px', maxWidth: 820 }}>Uma marca, duas frentes de monetização.</h1>
+          <p style={{ fontSize: 16.5, lineHeight: 1.6, color: 'rgba(23,20,23,0.65)', maxWidth: 680, margin: 0 }}>Lorenna Guerra é a marca guarda-chuva. Missão, valores, voz e tipografia são os mesmos em qualquer frente — só a paleta de cor muda para diferenciar Agência Logue de Método do Prompt ao Post.</p>
+        </div>
+      </div>
+
+      {/* MAPA */}
+      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '60px 6vw 0' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 14 }}>
+          {BRAND_MAP.map((b) => (
+            <div key={b.title} style={{ background: b.bg, borderRadius: 20, padding: 26 }}>
+              <div style={{ fontFamily: 'var(--font-syne-brand)', fontWeight: 700, fontSize: 13, color: b.labelColor, marginBottom: 6 }}>{b.label}</div>
+              <div style={{ fontFamily: 'var(--font-raleway)', fontWeight: 800, fontSize: 19, color: b.titleColor }}>{b.title}</div>
+              <p style={{ fontSize: 12.5, color: b.descColor, lineHeight: 1.5, margin: '8px 0 0' }}>{b.desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* MISSÃO */}
+      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '80px 6vw 0' }}>
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 14, marginBottom: 20 }}>
+          <div style={{ fontFamily: 'var(--font-syne-brand)', fontWeight: 800, fontSize: 13, color: '#c94e83' }}>01</div>
+          <h2 style={{ fontFamily: 'var(--font-raleway)', fontWeight: 900, fontSize: 'clamp(24px,2.8vw,32px)', letterSpacing: '-0.02em', margin: 0 }}>Missão, visão e valores — compartilhados por tudo</h2>
+        </div>
+        <div style={{ background: '#201e1f', borderRadius: 24, padding: 40, marginBottom: 16 }}>
+          <p style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: 'clamp(19px,2.2vw,24px)', lineHeight: 1.45, color: '#fff', margin: 0 }}>
+            &ldquo;Ajudar pessoas e marcas a desenvolverem criatividade aplicada à vida e aos negócios, transformando ideias em projetos mais profissionais, humanos e memoráveis.&rdquo;
           </p>
         </div>
-
-        <div className="px-8 sm:px-14">
-
-          {/* MAPA */}
-          <div className="pt-14 grid grid-cols-2 lg:grid-cols-4 gap-3.5">
-            {BRAND_MAP.map((b) => (
-              <div key={b.title} className="rounded-2xl p-6" style={{ background: b.bg }}>
-                <div className="font-[var(--font-syne-brand)] font-bold text-[13px] mb-1.5" style={{ color: b.labelColor }}>{b.label}</div>
-                <div className="font-[var(--font-raleway)] font-extrabold text-[19px]" style={{ color: b.titleColor }}>{b.title}</div>
-                <p className="text-[12.5px] leading-relaxed mt-2 mb-0" style={{ color: b.descColor }}>{b.desc}</p>
-              </div>
-            ))}
-          </div>
-
-          {/* MISSÃO */}
-          <div className="pt-20">
-            <SectionHeading n="01">Missão, visão e valores — compartilhados por tudo</SectionHeading>
-            <div className="rounded-3xl p-10 mb-4" style={{ background: '#201e1f' }}>
-              <p style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: 'clamp(19px,2.2vw,24px)', lineHeight: 1.45, color: '#fff', margin: 0 }}>
-                &ldquo;Ajudar pessoas e marcas a desenvolverem criatividade aplicada à vida e aos negócios,
-                transformando ideias em projetos mais profissionais, humanos e memoráveis.&rdquo;
-              </p>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 14, marginBottom: 16 }}>
+          {MISSION_CARDS.map((m) => (
+            <div key={m.title} style={{ background: m.bg, borderRadius: 18, padding: 22 }}>
+              <div style={{ fontFamily: 'var(--font-syne-brand)', fontWeight: 700, fontSize: 14, marginBottom: 6 }}>{m.emoji} {m.title}</div>
+              <p style={{ fontSize: 13, lineHeight: 1.5, color: 'rgba(23,20,23,0.7)', margin: 0 }}>{m.desc}</p>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 mb-4">
-              {MISSION_CARDS.map((m) => (
-                <div key={m.title} className="rounded-2xl p-5" style={{ background: m.bg }}>
-                  <div className="font-[var(--font-syne-brand)] font-bold text-sm mb-1.5">{m.emoji} {m.title}</div>
-                  <p className="text-[13px] leading-relaxed m-0" style={{ color: 'rgba(23,20,23,0.7)' }}>{m.desc}</p>
-                </div>
-              ))}
-            </div>
-            <p className="text-[13.5px] m-0" style={{ color: 'rgba(23,20,23,0.5)' }}>
-              Documento completo: <em>Marca Lorenna Guerra — Missão, Visão e Valores</em>. Valores, tom de voz e
-              frases proibidas valem igual para Agência Logue e Método do Prompt ao Post.
-            </p>
+          ))}
+        </div>
+        <p style={{ fontSize: 13.5, color: 'rgba(23,20,23,0.5)', margin: 0 }}>
+          Documento completo: <em>Marca Lorenna Guerra — Missão, Visão e Valores</em>. Valores, tom de voz e frases proibidas valem igual para Agência Logue e Método do Prompt ao Post.
+        </p>
+      </div>
+
+      {/* TIPOGRAFIA */}
+      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '80px 6vw 0' }}>
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 14, marginBottom: 20 }}>
+          <div style={{ fontFamily: 'var(--font-syne-brand)', fontWeight: 800, fontSize: 13, color: '#c94e83' }}>02</div>
+          <h2 style={{ fontFamily: 'var(--font-raleway)', fontWeight: 900, fontSize: 'clamp(24px,2.8vw,32px)', letterSpacing: '-0.02em', margin: 0 }}>Tipografia — mesma para as duas frentes</h2>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 16, marginBottom: 16 }}>
+          <div style={{ background: '#fdf3f6', borderRadius: 20, padding: 26 }}>
+            <div style={{ fontFamily: 'var(--font-raleway)', fontWeight: 900, fontSize: 36, letterSpacing: '-0.02em', marginBottom: 8 }}>Raleway</div>
+            <div style={{ fontFamily: 'var(--font-syne-brand)', fontWeight: 700, fontSize: 12.5, color: 'rgba(23,20,23,0.5)' }}>TÍTULOS — peso 900</div>
           </div>
-
-          {/* TIPOGRAFIA */}
-          <div className="pt-20">
-            <SectionHeading n="02">Tipografia — mesma para as duas frentes</SectionHeading>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
-              {TYPE_SAMPLES.map((t) => (
-                <div key={t.name} className="rounded-2xl p-6" style={{ background: '#fdf3f6' }}>
-                  <div className="mb-2" style={{ fontFamily: t.fontFamily, fontWeight: t.weight, fontSize: 36, letterSpacing: t.letterSpacing }}>{t.name}</div>
-                  <div className="font-[var(--font-syne-brand)] font-bold text-[12.5px]" style={{ color: 'rgba(23,20,23,0.5)' }}>{t.label}</div>
-                </div>
-              ))}
-            </div>
-            <p className="text-[13.5px] mb-3.5" style={{ color: 'rgba(23,20,23,0.5)' }}>
-              Fontes de destaque para títulos e legendas de vídeo — uso pontual, qualquer frente:
-            </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-              <div className="rounded-2xl p-5" style={{ background: '#c94e83' }}>
-                <div style={{ fontFamily: 'Georgia, serif', fontWeight: 800, fontSize: 32, color: '#fff' }}>Awesome Serif</div>
-              </div>
-              <div className="rounded-2xl p-5 flex items-center" style={{ background: '#201e1f' }}>
-                <div style={{ fontFamily: 'cursive', fontSize: 30, color: '#fff' }}>Bootzy TM</div>
-              </div>
-            </div>
+          <div style={{ background: '#fdf3f6', borderRadius: 20, padding: 26 }}>
+            <div style={{ fontFamily: 'var(--font-syne-brand)', fontWeight: 700, fontSize: 32, letterSpacing: '-0.01em', marginBottom: 8 }}>Syne</div>
+            <div style={{ fontFamily: 'var(--font-syne-brand)', fontWeight: 700, fontSize: 12.5, color: 'rgba(23,20,23,0.5)' }}>DESTAQUES, LABELS — peso 700/800</div>
           </div>
-
-          {/* PALETA LORENNA GUERRA */}
-          <div className="pt-20">
-            <SectionHeading n="03">Paleta completa — Lorenna Guerra</SectionHeading>
-            <p className="text-sm leading-relaxed mb-6 max-w-xl" style={{ color: 'rgba(23,20,23,0.6)' }}>
-              A marca-mãe usa todas as cores do sistema — ponto de partida de onde cada frente recorta seu subconjunto.
-            </p>
-            <SwatchGrid swatches={PALETTE_LORENNA} />
+          <div style={{ background: '#fdf3f6', borderRadius: 20, padding: 26 }}>
+            <div style={{ fontFamily: 'var(--font-questrial)', fontSize: 32, marginBottom: 8 }}>Questrial</div>
+            <div style={{ fontFamily: 'var(--font-syne-brand)', fontWeight: 700, fontSize: 12.5, color: 'rgba(23,20,23,0.5)' }}>TEXTO CORRIDO — peso 400</div>
           </div>
-
-          <PaletteSection
-            emoji="🎨"
-            title="Paleta — Agência Logue"
-            desc="Rosa pink, branco, preto e rosa claro como bases; lilás aparece só como degradê partindo do rosa pink — nunca sólido isolado."
-            swatches={PALETTE_LOGUE}
-            gradient={{ from: '#fe78b0', to: '#cbb8e8', label: 'degradê rosa pink → lilás #cbb8e8' }}
-          />
-
-          <PaletteSection
-            emoji="📈"
-            title="Paleta — Método do Prompt ao Post"
-            desc="Vermelho como cor de ação, rosa claro para fundos suaves, branco como base e dois amarelos para destaque e energia."
-            swatches={PALETTE_METODO}
-          />
-
-          <div className="pb-16">
-            <PaletteSection
-              emoji="🛍️"
-              title="Paleta — Papel da Lola (blog + afiliados)"
-              desc="Branco e as cores mais claras do sistema — leve e editorial para curadoria e produtos de afiliado. Sem marrom, vermelho ou preto."
-              swatches={PALETTE_LOLA}
-            />
+        </div>
+        <p style={{ fontSize: 13.5, color: 'rgba(23,20,23,0.5)', margin: '0 0 14px' }}>Fontes de destaque para títulos e legendas de vídeo — uso pontual, qualquer frente:</p>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+          <div style={{ background: '#c94e83', borderRadius: 18, padding: 22 }}>
+            <div style={{ fontFamily: 'Georgia, serif', fontWeight: 800, fontSize: 32, color: '#fff' }}>Awesome Serif</div>
           </div>
+          <div style={{ background: '#201e1f', borderRadius: 18, padding: 22, display: 'flex', alignItems: 'center' }}>
+            <div style={{ fontFamily: 'cursive', fontSize: 30, color: '#fff' }}>Bootzy TM</div>
+          </div>
+        </div>
+      </div>
 
+      {/* PALETA LORENNA GUERRA */}
+      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '80px 6vw 0' }}>
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 14, marginBottom: 8 }}>
+          <div style={{ fontFamily: 'var(--font-syne-brand)', fontWeight: 800, fontSize: 13, color: '#c94e83' }}>03</div>
+          <h2 style={{ fontFamily: 'var(--font-raleway)', fontWeight: 900, fontSize: 'clamp(24px,2.8vw,32px)', letterSpacing: '-0.02em', margin: 0 }}>Paleta completa — Lorenna Guerra</h2>
+        </div>
+        <p style={{ fontSize: 14, color: 'rgba(23,20,23,0.6)', lineHeight: 1.6, margin: '0 0 24px', maxWidth: 640 }}>A marca-mãe usa todas as cores do sistema — ponto de partida de onde cada frente recorta seu subconjunto.</p>
+        <Swatches swatches={PALETTE_LORENNA} />
+      </div>
+
+      {/* PALETA AGÊNCIA LOGUE */}
+      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '80px 6vw 0' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
+          <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#fe78b0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, flexShrink: 0 }}>🎨</div>
+          <h2 style={{ fontFamily: 'var(--font-raleway)', fontWeight: 900, fontSize: 'clamp(22px,2.4vw,28px)', letterSpacing: '-0.02em', margin: 0 }}>Paleta — Agência Logue</h2>
+        </div>
+        <p style={{ fontSize: 14, color: 'rgba(23,20,23,0.6)', lineHeight: 1.6, margin: '0 0 24px', maxWidth: 640 }}>Rosa pink, branco, preto e rosa claro como bases; lilás aparece só como degradê partindo do rosa pink — nunca sólido isolado.</p>
+        <Swatches swatches={PALETTE_LOGUE} />
+        <div style={{ marginTop: 12 }}>
+          <div style={{ borderRadius: 14, height: 76, background: 'linear-gradient(120deg, #fe78b0, #cbb8e8)', display: 'flex', alignItems: 'flex-end', padding: 10 }}>
+            <span style={{ fontFamily: 'var(--font-syne-brand)', fontSize: 11.5, color: '#201e1f' }}>degradê rosa pink → lilás #cbb8e8</span>
+          </div>
+        </div>
+      </div>
+
+      {/* PALETA MÉTODO */}
+      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '80px 6vw 0' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
+          <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#c32428', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, flexShrink: 0 }}>📈</div>
+          <h2 style={{ fontFamily: 'var(--font-raleway)', fontWeight: 900, fontSize: 'clamp(22px,2.4vw,28px)', letterSpacing: '-0.02em', margin: 0 }}>Paleta — Método do Prompt ao Post</h2>
+        </div>
+        <p style={{ fontSize: 14, color: 'rgba(23,20,23,0.6)', lineHeight: 1.6, margin: '0 0 24px', maxWidth: 640 }}>Vermelho como cor de ação, rosa claro para fundos suaves, branco como base e dois amarelos para destaque e energia.</p>
+        <Swatches swatches={PALETTE_METODO} />
+        <div style={{ marginTop: 12 }}>
+          <Swatches swatches={PALETTE_METODO_2} />
+        </div>
+      </div>
+
+      {/* PALETA PAPEL DA LOLA */}
+      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '80px 6vw 0' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
+          <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#a9d8f0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, flexShrink: 0 }}>🛍️</div>
+          <h2 style={{ fontFamily: 'var(--font-raleway)', fontWeight: 900, fontSize: 'clamp(22px,2.4vw,28px)', letterSpacing: '-0.02em', margin: 0 }}>Paleta — Papel da Lola (blog + afiliados)</h2>
+        </div>
+        <p style={{ fontSize: 14, color: 'rgba(23,20,23,0.6)', lineHeight: 1.6, margin: '0 0 24px', maxWidth: 640 }}>Branco e as cores mais claras do sistema — leve e editorial para curadoria e produtos de afiliado. Sem marrom, vermelho ou preto.</p>
+        <Swatches swatches={PALETTE_LOLA} />
+        <div style={{ marginTop: 12 }}>
+          <Swatches swatches={PALETTE_LOLA_2} />
         </div>
       </div>
     </div>

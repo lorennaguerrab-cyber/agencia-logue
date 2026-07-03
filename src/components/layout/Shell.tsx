@@ -76,13 +76,15 @@ function AppShell({ children }: { children: React.ReactNode }) {
   const router = useRouter()
   const { user } = useOsStore()
 
+  const standalone = pathname === '/login' || pathname === '/design-system'
+
   useEffect(() => {
-    if (!user && pathname !== '/login') {
+    if (!user && !standalone) {
       router.replace('/login')
     }
-  }, [user, pathname, router])
+  }, [user, standalone, router])
 
-  if (pathname === '/login') return <>{children}</>
+  if (standalone) return <>{children}</>
   if (!user) return null
 
   return (
