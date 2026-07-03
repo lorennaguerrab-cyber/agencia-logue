@@ -6,7 +6,7 @@ import { useOsStore } from '@/lib/os-store'
 import {
   LayoutDashboard, Users, KanbanSquare, Sparkles, Film,
   Calculator, FileText, Wallet, Target, Network, Building2,
-  ChevronDown,
+  Palette, ChevronDown,
 } from 'lucide-react'
 
 const NAV = [
@@ -34,6 +34,7 @@ const NAV = [
       { id: 'radar',      href: '/radar',      icon: Target,    name: 'Ticket Radar' },
       { id: 'rede',       href: '/rede',       icon: Network,   name: 'Rede Estratégica' },
       { id: 'agencia',    href: '/agencia',    icon: Building2, name: 'Agência' },
+      { id: 'design-system', href: '/design-system', icon: Palette, name: 'Design System' },
     ],
   },
 ]
