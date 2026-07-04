@@ -81,6 +81,7 @@ export const PLATFORM_LABELS: Record<string, string> = {
   linkedin: 'LinkedIn',
   collab: 'Collab',
   pinterest: 'Pinterest',
+  threads: 'Threads',
 }
 
 export const PLATFORM_COLORS: Record<string, string> = {
@@ -92,4 +93,5 @@ export const PLATFORM_COLORS: Record<string, string> = {
   linkedin: '#0077B5',
   collab: '#10B981',
   pinterest: '#E60023',
+  threads: '#000000',
 }

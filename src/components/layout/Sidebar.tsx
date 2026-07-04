@@ -6,7 +6,7 @@ import { useOsStore } from '@/lib/os-store'
 import {
   LayoutDashboard, Users, KanbanSquare, Sparkles, Film,
   Calculator, FileText, Wallet, Target, Network, Building2,
-  Palette, ChevronDown,
+  Palette, CalendarClock, ChevronDown,
 } from 'lucide-react'
 
 const NAV = [
@@ -21,6 +21,7 @@ const NAV = [
   {
     group: 'Criar',
     items: [
+      { id: 'rotinas',       href: '/rotinas',       icon: CalendarClock, name: 'Rotina Diária' },
       { id: 'ia',            href: '/ia',            icon: Sparkles,    name: 'IA de Conteúdo' },
       { id: 'roteiros',      href: '/roteiros',      icon: Film,        name: 'Roteiros' },
       { id: 'precificacao',  href: '/precificacao',  icon: Calculator,  name: 'Precificação' },

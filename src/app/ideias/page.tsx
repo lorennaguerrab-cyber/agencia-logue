@@ -36,6 +36,7 @@ const PLATFORM_ICONS: Record<Platform, React.ReactNode> = {
   linkedin: <span className="text-[10px]">in</span>,
   collab: <Sparkles size={10} />,
   pinterest: <span className="text-[10px]">Pi</span>,
+  threads: <span className="text-[10px]">@</span>,
 }
 
 const DEMO: IdeaRow[] = [

@@ -93,6 +93,7 @@ export type Platform =
   | 'linkedin'
   | 'collab'
   | 'pinterest'
+  | 'threads'
 
 export interface Client {
   id: string
